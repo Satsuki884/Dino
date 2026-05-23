@@ -41,12 +41,16 @@ public class FoodSlotUI : MonoBehaviour
             return;
 
         int amount = FoodInventory.Instance.GetFoodAmount(foodConfig);
+        bool hasFood = amount > 0;
 
         if (amountText != null)
             amountText.text = amount.ToString();
 
+        if (iconImage != null)
+            iconImage.color = hasFood ? Color.white : new Color(1f, 1f, 1f, 0.35f);
+
         if (draggableFood != null)
-            draggableFood.SetAvailable(amount > 0);
+            draggableFood.SetAvailable(hasFood);
     }
 
     private void BuyFood()

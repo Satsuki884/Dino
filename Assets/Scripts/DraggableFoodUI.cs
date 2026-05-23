@@ -19,6 +19,9 @@ public class DraggableFoodUI : MonoBehaviour,
     public bool closeInventoryWhenDraggedOutside = true;
     public bool showDebugLogs = true;
 
+    [Header("Dino Detection")]
+    public float detectionRadius = 0.7f;
+
     private FoodConfig foodConfig;
     private Image currentDragIcon;
     private Canvas rootCanvas;
@@ -36,10 +39,10 @@ public class DraggableFoodUI : MonoBehaviour,
         Image image = GetComponent<Image>();
 
         if (image == null)
-            Debug.LogWarning(name + ": на DragArea немає Image. Drag не буде працювати.");
+            Debug.LogWarning(name + ": DragArea has no Image. Drag will not work.");
 
         if (image != null && !image.raycastTarget)
-            Debug.LogWarning(name + ": Image Raycast Target вимкнений. Drag не буде працювати.");
+            Debug.LogWarning(name + ": DragArea Image Raycast Target is disabled. Drag will not work.");
     }
 
     public void Init(FoodConfig config)
@@ -59,7 +62,9 @@ public class DraggableFoodUI : MonoBehaviour,
         if (image != null)
         {
             image.raycastTarget = true;
-            image.color = isAvailable ? Color.white : new Color(1f, 1f, 1f, 0.35f);
+
+            // DragArea має ловити drag, але НЕ має бути видимим.
+            image.color = new Color(1f, 1f, 1f, 0f);
         }
 
         if (showDebugLogs)
@@ -135,16 +140,7 @@ public class DraggableFoodUI : MonoBehaviour,
         if (currentDragIcon != null)
             Destroy(currentDragIcon.gameObject);
 
-        bool wasFed = TryFeedDino(eventData.position);
-
-        if (wasFed)
-        {
-            FoodInventory.Instance.UseFood(foodConfig);
-        }
-        else
-        {
-            FoodInventory.Instance.RefreshInventoryUI();
-        }
+        TryUseFoodOnDino(eventData.position);
 
         if (disableScrollWhileDragging && parentScrollRect != null)
             parentScrollRect.enabled = true;
@@ -161,7 +157,7 @@ public class DraggableFoodUI : MonoBehaviour,
     {
         if (!isAvailable)
         {
-            Debug.LogWarning(name + ": їжа недоступна. Можливо amount = 0.");
+            Debug.LogWarning(name + ": food is not available. Maybe amount = 0.");
             return false;
         }
 
@@ -179,13 +175,13 @@ public class DraggableFoodUI : MonoBehaviour,
 
         if (!FoodInventory.Instance.HasFood(foodConfig))
         {
-            Debug.LogWarning(name + ": у інвентарі немає цієї їжі: " + foodConfig.foodName);
+            Debug.LogWarning(name + ": no food in inventory: " + foodConfig.foodName);
             return false;
         }
 
         if (dragIconPrefab == null)
         {
-            Debug.LogWarning(name + ": Drag Icon Prefab не підставлений.");
+            Debug.LogWarning(name + ": Drag Icon Prefab is not assigned.");
             return false;
         }
 
@@ -196,6 +192,64 @@ public class DraggableFoodUI : MonoBehaviour,
         }
 
         return true;
+    }
+
+    private void TryUseFoodOnDino(Vector2 screenPosition)
+    {
+        Dino targetDino = FindDinoUnderPointer(screenPosition);
+
+        if (targetDino == null)
+        {
+            if (showDebugLogs)
+                Debug.Log("Food was not dropped on dino. Food is not used.");
+
+            FoodInventory.Instance.RefreshInventoryUI();
+            return;
+        }
+
+        bool foodWasUsed = FoodInventory.Instance.UseFood(foodConfig);
+
+        if (!foodWasUsed)
+        {
+            if (showDebugLogs)
+                Debug.LogWarning("Could not use food from inventory: " + foodConfig.foodName);
+
+            FoodInventory.Instance.RefreshInventoryUI();
+            return;
+        }
+
+        targetDino.Feed(foodConfig);
+
+        if (showDebugLogs)
+        {
+            int amountLeft = FoodInventory.Instance.GetFoodAmount(foodConfig);
+            Debug.Log("Fed dino with " + foodConfig.foodName + ". Food left: " + amountLeft);
+        }
+    }
+
+    private Dino FindDinoUnderPointer(Vector2 screenPosition)
+    {
+        Camera camera = Camera.main;
+
+        if (camera == null)
+            return null;
+
+        Vector3 worldPosition = camera.ScreenToWorldPoint(screenPosition);
+        worldPosition.z = 0f;
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(worldPosition, detectionRadius);
+
+        foreach (Collider2D hit in hits)
+        {
+            Dino dino = hit.GetComponentInParent<Dino>();
+
+            if (dino == null)
+                continue;
+
+            return dino;
+        }
+
+        return null;
     }
 
     private void TryHideInventoryIfDraggedOutside(Vector2 screenPosition)
@@ -222,31 +276,5 @@ public class DraggableFoodUI : MonoBehaviour,
 
         UIPanelController.Instance.HideFoodPanelDuringDrag();
         inventoryWasHidden = true;
-    }
-
-    private bool TryFeedDino(Vector2 screenPosition)
-    {
-        Camera camera = Camera.main;
-
-        if (camera == null)
-            return false;
-
-        Vector3 worldPosition = camera.ScreenToWorldPoint(screenPosition);
-        worldPosition.z = 0f;
-
-        float detectionRadius = 0.5f;
-        Collider2D[] hits = Physics2D.OverlapCircleAll(worldPosition, detectionRadius);
-
-        foreach (Collider2D hit in hits)
-        {
-            Dino dino = hit.GetComponentInParent<Dino>();
-
-            if (dino == null)
-                continue;
-
-            return dino.Feed(foodConfig);
-        }
-
-        return false;
     }
 }
