@@ -24,7 +24,7 @@ MonoBehaviour:
     ticksToNextStage: 8
     caloriesConsumePerTick: 12
     coinsPerTick: 0.2
-    canMove: 1
+    canMove: 0
   - stageName: Stage 2
     sprite: {fileID: 1451478870644479156, guid: 5195c0e281f7f874ab24d1648a2a4d10, type: 3}
     ticksToNextStage: 30
