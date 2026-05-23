@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1903402949639684366}
   - component: {fileID: 8571709224217874888}
   - component: {fileID: 2928613361343995518}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -86,7 +86,7 @@ GameObject:
   - component: {fileID: 4964453156726239259}
   - component: {fileID: 3135060579663887816}
   - component: {fileID: 5082044889843959557}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -160,7 +160,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2983919277674834260}
   - component: {fileID: 591587110031997898}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: SatietySlider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -250,7 +250,7 @@ GameObject:
   m_Component:
   - component: {fileID: 418360932651796338}
   - component: {fileID: 1125509961318083159}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -340,7 +340,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1854734392651366218}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Handle Slide Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -375,7 +375,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2055017378656291804}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -413,7 +413,7 @@ GameObject:
   - component: {fileID: 990563938801259559}
   - component: {fileID: 819982217114616920}
   - component: {fileID: 1265294202672949989}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -488,7 +488,7 @@ GameObject:
   - component: {fileID: 7699849836962888588}
   - component: {fileID: 1761829560085934400}
   - component: {fileID: 5420667931163496435}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: LevelText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -623,7 +623,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4669775645846612668}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Handle Slide Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -661,7 +661,7 @@ GameObject:
   - component: {fileID: 961483384104676080}
   - component: {fileID: 1005154453728950296}
   - component: {fileID: 6669719407137543037}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Dino
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -780,7 +780,7 @@ GameObject:
   - component: {fileID: 1571734255966523976}
   - component: {fileID: 1700382441241984354}
   - component: {fileID: 3058118637651814758}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: WorldCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -882,7 +882,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1868957815191758371}
   - component: {fileID: 6008891838706819883}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: GrowthSlider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -971,7 +971,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2640300451417720315}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1009,7 +1009,7 @@ GameObject:
   - component: {fileID: 3084083818057979164}
   - component: {fileID: 4158505698953428886}
   - component: {fileID: 5359760049778148795}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
