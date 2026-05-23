@@ -515,6 +515,7 @@ MonoBehaviour:
   foodInventoryPanel: {fileID: 1422603324}
   shopPanelRect: {fileID: 954285759}
   foodInventoryPanelRect: {fileID: 1447569065}
+  foodInventoryCanvasGroup: {fileID: 1422603326}
   shopButton: {fileID: 2030663557}
   foodButton: {fileID: 1936000363}
   shopCloseButton: {fileID: 1924952360}
@@ -1845,8 +1846,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -50}
-  m_SizeDelta: {x: -1200, y: -300}
+  m_AnchoredPosition: {x: 0, y: -75}
+  m_SizeDelta: {x: -1200, y: -250}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &904027353
 MonoBehaviour:
@@ -2400,6 +2401,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1422603325}
+  - component: {fileID: 1422603326}
   m_Layer: 5
   m_Name: FoodInventoryPanel
   m_TagString: Untagged
@@ -2429,6 +2431,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -1000, y: -600}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &1422603326
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1422603324}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1443061257
 GameObject:
   m_ObjectHideFlags: 0

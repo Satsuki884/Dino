@@ -3,6 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class DraggableFoodUI : MonoBehaviour,
+    IPointerDownHandler,
     IBeginDragHandler,
     IDragHandler,
     IEndDragHandler,
@@ -16,6 +17,7 @@ public class DraggableFoodUI : MonoBehaviour,
     [Header("Settings")]
     public bool disableScrollWhileDragging = true;
     public bool closeInventoryWhenDraggedOutside = true;
+    public bool showDebugLogs = true;
 
     private FoodConfig foodConfig;
     private Image currentDragIcon;
@@ -24,17 +26,28 @@ public class DraggableFoodUI : MonoBehaviour,
 
     private bool isAvailable;
     private bool isDragging;
-    private bool inventoryWasClosed;
+    private bool inventoryWasHidden;
 
     private void Awake()
     {
         rootCanvas = GetComponentInParent<Canvas>();
         parentScrollRect = GetComponentInParent<ScrollRect>();
+
+        Image image = GetComponent<Image>();
+
+        if (image == null)
+            Debug.LogWarning(name + ": на DragArea немає Image. Drag не буде працювати.");
+
+        if (image != null && !image.raycastTarget)
+            Debug.LogWarning(name + ": Image Raycast Target вимкнений. Drag не буде працювати.");
     }
 
     public void Init(FoodConfig config)
     {
         foodConfig = config;
+
+        if (showDebugLogs)
+            Debug.Log(name + ": Init food = " + (foodConfig != null ? foodConfig.foodName : "NULL"));
     }
 
     public void SetAvailable(bool value)
@@ -48,21 +61,41 @@ public class DraggableFoodUI : MonoBehaviour,
             image.raycastTarget = true;
             image.color = isAvailable ? Color.white : new Color(1f, 1f, 1f, 0.35f);
         }
+
+        if (showDebugLogs)
+            Debug.Log(name + ": SetAvailable = " + isAvailable);
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (showDebugLogs)
+            Debug.Log(name + ": POINTER DOWN on food drag area");
     }
 
     public void OnInitializePotentialDrag(PointerEventData eventData)
     {
         eventData.useDragThreshold = false;
+
+        if (showDebugLogs)
+            Debug.Log(name + ": Initialize potential drag");
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (showDebugLogs)
+            Debug.Log(name + ": BEGIN DRAG");
+
         if (!CanDrag())
+        {
+            if (showDebugLogs)
+                Debug.LogWarning(name + ": CanDrag returned FALSE");
+
             return;
+        }
 
         isDragging = true;
         IsDraggingFood = true;
-        inventoryWasClosed = false;
+        inventoryWasHidden = false;
 
         if (disableScrollWhileDragging && parentScrollRect != null)
             parentScrollRect.enabled = false;
@@ -71,7 +104,6 @@ public class DraggableFoodUI : MonoBehaviour,
             rootCanvas = GetComponentInParent<Canvas>();
 
         currentDragIcon = Instantiate(dragIconPrefab, rootCanvas.transform);
-
         currentDragIcon.sprite = foodConfig.icon;
         currentDragIcon.preserveAspect = true;
         currentDragIcon.raycastTarget = false;
@@ -89,11 +121,14 @@ public class DraggableFoodUI : MonoBehaviour,
             currentDragIcon.transform.position = eventData.position;
 
         if (closeInventoryWhenDraggedOutside)
-            TryCloseInventoryIfDraggedOutside(eventData.position);
+            TryHideInventoryIfDraggedOutside(eventData.position);
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (showDebugLogs)
+            Debug.Log(name + ": END DRAG");
+
         if (!isDragging)
             return;
 
@@ -114,37 +149,58 @@ public class DraggableFoodUI : MonoBehaviour,
         if (disableScrollWhileDragging && parentScrollRect != null)
             parentScrollRect.enabled = true;
 
+        if (UIPanelController.Instance != null)
+            UIPanelController.Instance.FinishFoodPanelDragClose();
+
         isDragging = false;
         IsDraggingFood = false;
-        inventoryWasClosed = false;
+        inventoryWasHidden = false;
     }
 
     private bool CanDrag()
     {
         if (!isAvailable)
+        {
+            Debug.LogWarning(name + ": їжа недоступна. Можливо amount = 0.");
             return false;
+        }
 
         if (foodConfig == null)
+        {
+            Debug.LogWarning(name + ": foodConfig == null.");
             return false;
+        }
 
         if (FoodInventory.Instance == null)
+        {
+            Debug.LogWarning(name + ": FoodInventory.Instance == null.");
             return false;
+        }
 
         if (!FoodInventory.Instance.HasFood(foodConfig))
+        {
+            Debug.LogWarning(name + ": у інвентарі немає цієї їжі: " + foodConfig.foodName);
             return false;
+        }
 
         if (dragIconPrefab == null)
         {
-            Debug.LogWarning("Drag Icon Prefab is not assigned.");
+            Debug.LogWarning(name + ": Drag Icon Prefab не підставлений.");
+            return false;
+        }
+
+        if (rootCanvas == null)
+        {
+            Debug.LogWarning(name + ": rootCanvas == null.");
             return false;
         }
 
         return true;
     }
 
-    private void TryCloseInventoryIfDraggedOutside(Vector2 screenPosition)
+    private void TryHideInventoryIfDraggedOutside(Vector2 screenPosition)
     {
-        if (inventoryWasClosed)
+        if (inventoryWasHidden)
             return;
 
         if (UIPanelController.Instance == null)
@@ -164,8 +220,8 @@ public class DraggableFoodUI : MonoBehaviour,
         if (insideInventory)
             return;
 
-        UIPanelController.Instance.CloseFoodPanelOnly();
-        inventoryWasClosed = true;
+        UIPanelController.Instance.HideFoodPanelDuringDrag();
+        inventoryWasHidden = true;
     }
 
     private bool TryFeedDino(Vector2 screenPosition)
@@ -178,7 +234,8 @@ public class DraggableFoodUI : MonoBehaviour,
         Vector3 worldPosition = camera.ScreenToWorldPoint(screenPosition);
         worldPosition.z = 0f;
 
-        Collider2D[] hits = Physics2D.OverlapPointAll(worldPosition);
+        float detectionRadius = 0.5f;
+        Collider2D[] hits = Physics2D.OverlapCircleAll(worldPosition, detectionRadius);
 
         foreach (Collider2D hit in hits)
         {

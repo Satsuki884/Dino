@@ -17,6 +17,9 @@ public class UIPanelController : MonoBehaviour
     public RectTransform shopPanelRect;
     public RectTransform foodInventoryPanelRect;
 
+    [Header("Canvas Groups")]
+    public CanvasGroup foodInventoryCanvasGroup;
+
     [Header("Open Buttons")]
     public Button shopButton;
     public Button foodButton;
@@ -32,6 +35,7 @@ public class UIPanelController : MonoBehaviour
     private RectTransform currentOpenPanelRect;
 
     private bool ignoreNextOutsideClick;
+    private bool foodPanelHiddenDuringDrag;
 
     private void Awake()
     {
@@ -40,6 +44,9 @@ public class UIPanelController : MonoBehaviour
 
     private void Start()
     {
+        if (foodInventoryCanvasGroup == null && foodInventoryPanel != null)
+            foodInventoryCanvasGroup = foodInventoryPanel.GetComponent<CanvasGroup>();
+
         if (shopButton != null)
             shopButton.onClick.AddListener(OnShopButtonClicked);
 
@@ -57,8 +64,6 @@ public class UIPanelController : MonoBehaviour
 
     private void Update()
     {
-        // Якщо зараз тягнемо їжу, не закриваємо панелі автоматично.
-        // Інакше інвентар може закритися ще до того, як їжу кинуть на дракончика.
         if (DraggableFoodUI.IsDraggingFood)
             return;
 
@@ -105,22 +110,18 @@ public class UIPanelController : MonoBehaviour
 
         ignoreNextOutsideClick = true;
 
-        // Якщо нічого не відкрито — відкриваємо натиснуту панель.
         if (currentOpenPanel == null)
         {
             OpenPanel(targetPanel, targetPanelRect);
             return;
         }
 
-        // Якщо натиснули кнопку тієї самої панелі — закриваємо її.
         if (currentOpenPanel == targetPanel)
         {
             CloseAllPanels();
             return;
         }
 
-        // Якщо відкрита інша панель — тільки закриваємо поточну.
-        // Нову панель гравець відкриє другим натисканням.
         CloseAllPanels();
     }
 
@@ -129,6 +130,9 @@ public class UIPanelController : MonoBehaviour
         CloseAllPanels();
 
         panel.SetActive(true);
+
+        if (panel == foodInventoryPanel)
+            ShowFoodPanelVisuals();
 
         currentOpenPanel = panel;
         currentOpenPanelRect = panelRect;
@@ -142,8 +146,11 @@ public class UIPanelController : MonoBehaviour
         if (foodInventoryPanel != null)
             foodInventoryPanel.SetActive(false);
 
+        ShowFoodPanelVisuals();
+
         currentOpenPanel = null;
         currentOpenPanelRect = null;
+        foodPanelHiddenDuringDrag = false;
     }
 
     public void CloseFoodPanelOnly()
@@ -151,11 +158,15 @@ public class UIPanelController : MonoBehaviour
         if (foodInventoryPanel != null)
             foodInventoryPanel.SetActive(false);
 
+        ShowFoodPanelVisuals();
+
         if (currentOpenPanel == foodInventoryPanel)
         {
             currentOpenPanel = null;
             currentOpenPanelRect = null;
         }
+
+        foodPanelHiddenDuringDrag = false;
     }
 
     public void CloseShopPanelOnly()
@@ -168,6 +179,62 @@ public class UIPanelController : MonoBehaviour
             currentOpenPanel = null;
             currentOpenPanelRect = null;
         }
+    }
+
+    public void HideFoodPanelDuringDrag()
+    {
+        if (foodInventoryPanel == null)
+            return;
+
+        if (!foodInventoryPanel.activeSelf)
+            return;
+
+        if (foodInventoryCanvasGroup == null)
+            foodInventoryCanvasGroup = foodInventoryPanel.GetComponent<CanvasGroup>();
+
+        if (foodInventoryCanvasGroup == null)
+        {
+            Debug.LogWarning("FoodInventoryPanel has no CanvasGroup.");
+            return;
+        }
+
+        foodInventoryCanvasGroup.alpha = 0f;
+        foodInventoryCanvasGroup.interactable = false;
+        foodInventoryCanvasGroup.blocksRaycasts = false;
+
+        foodPanelHiddenDuringDrag = true;
+    }
+
+    public void FinishFoodPanelDragClose()
+    {
+        if (!foodPanelHiddenDuringDrag)
+            return;
+
+        if (foodInventoryPanel != null)
+            foodInventoryPanel.SetActive(false);
+
+        ShowFoodPanelVisuals();
+
+        if (currentOpenPanel == foodInventoryPanel)
+        {
+            currentOpenPanel = null;
+            currentOpenPanelRect = null;
+        }
+
+        foodPanelHiddenDuringDrag = false;
+    }
+
+    private void ShowFoodPanelVisuals()
+    {
+        if (foodInventoryCanvasGroup == null && foodInventoryPanel != null)
+            foodInventoryCanvasGroup = foodInventoryPanel.GetComponent<CanvasGroup>();
+
+        if (foodInventoryCanvasGroup == null)
+            return;
+
+        foodInventoryCanvasGroup.alpha = 1f;
+        foodInventoryCanvasGroup.interactable = true;
+        foodInventoryCanvasGroup.blocksRaycasts = true;
     }
 
     public RectTransform GetFoodPanelRect()
