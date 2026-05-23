@@ -134,9 +134,16 @@ public class Dino : MonoBehaviour
         if (stageData.ticksToNextStage <= 0f)
             return;
 
+        float multiplier = 1f;
+
+        if (config != null)
+            multiplier = Mathf.Max(1f, config.growthTimeMultiplier);
+
+        float requiredTicks = stageData.ticksToNextStage * multiplier;
+
         growthTicks += 1f;
 
-        if (growthTicks >= stageData.ticksToNextStage)
+        if (growthTicks >= requiredTicks)
         {
             growthTicks = 0f;
             TryGrowToNextStage();
@@ -341,7 +348,10 @@ public class Dino : MonoBehaviour
             return;
         }
 
-        growthSlider.value = growthTicks / stageData.ticksToNextStage;
+        float multiplier = config != null ? Mathf.Max(1f, config.growthTimeMultiplier) : 1f;
+        float requiredTicks = stageData.ticksToNextStage * multiplier;
+
+        growthSlider.value = growthTicks / requiredTicks;
     }
 
     private void UpdateLevelText()

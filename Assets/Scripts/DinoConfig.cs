@@ -18,4 +18,7 @@ public class DinoConfig : ScriptableObject
 
     [Header("Stages")]
     public DinoStageData[] stages;
+
+    [Header("Balance")]
+    public float growthTimeMultiplier = 2f;
 }
