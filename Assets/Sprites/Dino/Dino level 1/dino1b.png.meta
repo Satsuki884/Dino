@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a9b76c8da6df0dc46ac94b8721179488
+guid: 9a1e0c98d892ea945abf7981f2d56972
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -4906693884735968781
-    second: food512_0
+      213: -7033090210418254279
+    second: dino1b_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -109,24 +109,11 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WindowsStoreApps
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: food512_0
+      name: dino1b_0
       rect:
         serializedVersion: 2
         x: 0
@@ -141,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3f92bba98ebe7ebb0800000000000000
-      internalID: -4906693884735968781
+      spriteID: 93e1ebe67b1756e90800000000000000
+      internalID: -7033090210418254279
       vertices: []
       indices: 
       edges: []
@@ -151,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: b9d645649c4d1284a8106f01f3c36553
+    spriteID: f03634e76c959b443ad13fa47949456c
     internalID: 0
     vertices: []
     indices: 
@@ -161,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      food512_0: -4906693884735968781
+      dino1b_0: -7033090210418254279
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
