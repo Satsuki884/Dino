@@ -197,6 +197,9 @@ public class GameManager : MonoBehaviour
 
             if (shopManager != null)
                 shopManager.RefreshShop();
+
+            if (FoodInventory.Instance != null)
+                FoodInventory.Instance.RefreshInventoryUI();
         }
     }
 
