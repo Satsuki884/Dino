@@ -49,8 +49,6 @@ public class DraggableFoodUI : MonoBehaviour,
     {
         foodConfig = config;
 
-        if (showDebugLogs)
-            Debug.Log(name + ": Init food = " + (foodConfig != null ? foodConfig.foodName : "NULL"));
     }
 
     public void SetAvailable(bool value)
