@@ -1,10 +1,16 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
+#endif
+
 public class DinoTouchInput : MonoBehaviour
 {
-    [Header("Layers")]
-    public LayerMask dinoLayerMask;
+
+    [Header("UI Blocking")]
+    public bool blockInputOverUI = true; 
 
     private Camera mainCamera;
 
@@ -12,74 +18,84 @@ public class DinoTouchInput : MonoBehaviour
     private Vector3 dragOffset;
 
     private bool isDragging;
-    private Vector2 touchStartPosition;
+    private Vector2 pointerStartPosition;
 
-    private const float dragDistance = 20f;
+    private const float dragDistance = 5f;
 
     private void Awake()
     {
-        mainCamera = Camera.main;
-    }
+        mainCamera = Camera.main;}
 
     private void Update()
     {
-        HandleMouseInput();
-        HandleTouchInput();
+        HandlePointerInput();
     }
 
-    private void HandleMouseInput()
+    private void HandlePointerInput()
     {
+        bool pressedThisFrame = false;
+        bool isPressed = false;
+        bool releasedThisFrame = false;
+        Vector2 screenPosition = Vector2.zero;
+
+#if ENABLE_INPUT_SYSTEM
+        if (Mouse.current != null)
+        {
+            pressedThisFrame = Mouse.current.leftButton.wasPressedThisFrame;
+            isPressed = Mouse.current.leftButton.isPressed;
+            releasedThisFrame = Mouse.current.leftButton.wasReleasedThisFrame;
+            screenPosition = Mouse.current.position.ReadValue();
+        }
+
+        if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed)
+        {
+            TouchControl touch = Touchscreen.current.primaryTouch;
+
+            pressedThisFrame = touch.press.wasPressedThisFrame;
+            isPressed = touch.press.isPressed;
+            releasedThisFrame = touch.press.wasReleasedThisFrame;
+            screenPosition = touch.position.ReadValue();
+        }
+#else
+        pressedThisFrame = Input.GetMouseButtonDown(0);
+        isPressed = Input.GetMouseButton(0);
+        releasedThisFrame = Input.GetMouseButtonUp(0);
+        screenPosition = Input.mousePosition;
+
         if (Input.touchCount > 0)
-            return;
-
-        if (Input.GetMouseButtonDown(0))
         {
-            if (IsPointerOverUI())
+            Touch touch = Input.GetTouch(0);
+
+            pressedThisFrame = touch.phase == TouchPhase.Began;
+            isPressed = touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary;
+            releasedThisFrame = touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled;
+            screenPosition = touch.position;
+        }
+#endif
+
+        if (pressedThisFrame)
+        {
+            if (blockInputOverUI && IsPointerOverUI())
+            {
                 return;
+            }
 
-            TrySelectDino(Input.mousePosition);
+            pointerStartPosition = screenPosition;
+            TrySelectDino(screenPosition);
         }
 
-        if (Input.GetMouseButton(0) && selectedDino != null)
+        if (isPressed && selectedDino != null)
         {
-            isDragging = true;
-            DragSelected(Input.mousePosition);
-        }
-
-        if (Input.GetMouseButtonUp(0))
-        {
-            ReleaseSelected();
-        }
-    }
-
-    private void HandleTouchInput()
-    {
-        if (Input.touchCount <= 0)
-            return;
-
-        Touch touch = Input.GetTouch(0);
-
-        if (touch.phase == TouchPhase.Began)
-        {
-            if (IsPointerOverUI(touch.fingerId))
-                return;
-
-            touchStartPosition = touch.position;
-            TrySelectDino(touch.position);
-        }
-
-        if (touch.phase == TouchPhase.Moved && selectedDino != null)
-        {
-            float distance = Vector2.Distance(touchStartPosition, touch.position);
+            float distance = Vector2.Distance(pointerStartPosition, screenPosition);
 
             if (distance > dragDistance)
                 isDragging = true;
 
             if (isDragging)
-                DragSelected(touch.position);
+                DragSelected(screenPosition);
         }
 
-        if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+        if (releasedThisFrame)
         {
             ReleaseSelected();
         }
@@ -88,44 +104,37 @@ public class DinoTouchInput : MonoBehaviour
     private void TrySelectDino(Vector2 screenPosition)
     {
         if (mainCamera == null)
+        {
             mainCamera = Camera.main;
 
-        if (mainCamera == null)
-        {
-            Debug.LogError("Main Camera not found. Check MainCamera tag.");
-            return;
+            if (mainCamera == null)
+            {
+                return;
+            }
         }
 
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(screenPosition);
         worldPosition.z = 0f;
 
-        Collider2D[] hits = Physics2D.OverlapPointAll(worldPosition, dinoLayerMask);
+        Collider2D hit = Physics2D.OverlapPoint(worldPosition);
 
-        if (hits == null || hits.Length == 0)
+        if (hit == null)
         {
-            Debug.Log("No Dino collider under pointer.");
             return;
         }
 
-        foreach (Collider2D hit in hits)
+        Dino dino = hit.GetComponentInParent<Dino>();
+
+        if (dino == null)
         {
-            Dino dino = hit.GetComponentInParent<Dino>();
-
-            if (dino == null)
-                continue;
-
-            selectedDino = dino;
-            dragOffset = selectedDino.transform.position - worldPosition;
-            isDragging = false;
-
-            selectedDino.SetDragging(true);
-
-            Debug.Log("Selected dino: " + selectedDino.name);
-
             return;
         }
 
-        Debug.Log("Dino layer collider found, but Dino component not found.");
+        selectedDino = dino;
+        dragOffset = selectedDino.transform.position - worldPosition;
+        isDragging = false;
+
+        selectedDino.SetDragging(true);
     }
 
     private void DragSelected(Vector2 screenPosition)
@@ -155,9 +164,7 @@ public class DinoTouchInput : MonoBehaviour
         selectedDino.SetDragging(false);
 
         if (isDragging)
-        {
             TryMergeSelectedDino();
-        }
 
         selectedDino = null;
         isDragging = false;
@@ -168,11 +175,7 @@ public class DinoTouchInput : MonoBehaviour
         if (selectedDino == null)
             return false;
 
-        Collider2D[] hits = Physics2D.OverlapCircleAll(
-            selectedDino.transform.position,
-            0.6f,
-            dinoLayerMask
-        );
+        Collider2D[] hits = Physics2D.OverlapCircleAll(selectedDino.transform.position, 0.6f);
 
         foreach (Collider2D hit in hits)
         {
@@ -213,13 +216,5 @@ public class DinoTouchInput : MonoBehaviour
             return false;
 
         return EventSystem.current.IsPointerOverGameObject();
-    }
-
-    private bool IsPointerOverUI(int fingerId)
-    {
-        if (EventSystem.current == null)
-            return false;
-
-        return EventSystem.current.IsPointerOverGameObject(fingerId);
     }
 }
