@@ -21,6 +21,7 @@ public class Dino : MonoBehaviour
     private Vector2 moveDirection;
     private bool isDragging;
     private float tickTimer;
+    private bool isInRaid;
 
     public int Level => config != null ? config.level : 0;
     public int Stage => currentStage;
@@ -43,6 +44,9 @@ public class Dino : MonoBehaviour
     private void Update()
     {
         if (config == null)
+            return;
+
+        if (isInRaid)
             return;
 
         if (!isDragging)
@@ -152,6 +156,9 @@ public class Dino : MonoBehaviour
 
     public bool Feed(FoodConfig food)
     {
+        if (isInRaid)
+            return false;
+
         if (food == null)
             return false;
 
@@ -240,6 +247,9 @@ public class Dino : MonoBehaviour
             return false;
 
         if (other == this)
+            return false;
+
+        if (isInRaid || other.isInRaid)
             return false;
 
         if (Level != other.Level)
@@ -378,5 +388,39 @@ public class Dino : MonoBehaviour
             return false;
 
         return GameManager.Instance.IsMaxDinoLevel(Level);
+    }
+
+    public bool IsInRaid()
+    {
+        return isInRaid;
+    }
+
+    public void StartRaidMode()
+    {
+        isInRaid = true;
+        isDragging = false;
+
+        gameObject.SetActive(false);
+    }
+
+    public void EndRaidMode(Vector3 returnPosition)
+    {
+        transform.position = returnPosition;
+        gameObject.SetActive(true);
+
+        isInRaid = false;
+
+        UpdateVisual();
+        UpdateUI();
+    }
+
+    public Sprite GetCurrentSprite()
+    {
+        DinoStageData stageData = CurrentStageData;
+
+        if (stageData == null)
+            return null;
+
+        return stageData.sprite;
     }
 }
