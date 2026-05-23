@@ -28,7 +28,7 @@ public class SpawnedCoin : MonoBehaviour
         lifeTime = newLifeTime;
 
         if (valueText != null)
-            valueText.text = value.ToString();
+            valueText.text = "coin " + value;
 
         Destroy(gameObject, lifeTime);
     }
