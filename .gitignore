@@ -64,3 +64,5 @@ desktop.ini
 *.orig
 *.old
 /Assets/TextMesh Pro
+Dino/D3D12/D3D12Core.dll
+/Dino
