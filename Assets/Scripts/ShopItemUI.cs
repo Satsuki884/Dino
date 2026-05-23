@@ -17,8 +17,11 @@ public class ShopItemUI : MonoBehaviour
     {
         config = newConfig;
 
-        buyButton.onClick.RemoveAllListeners();
-        buyButton.onClick.AddListener(Buy);
+        if (buyButton != null)
+        {
+            buyButton.onClick.RemoveAllListeners();
+            buyButton.onClick.AddListener(Buy);
+        }
 
         Refresh();
     }
@@ -37,19 +40,40 @@ public class ShopItemUI : MonoBehaviour
         if (priceText != null)
             priceText.text = config.buyPrice.ToString();
 
+        Sprite firstStageSprite = GetFirstStageSprite();
+
         if (iconImage != null)
         {
-            if (config.stageSprites != null && config.stageSprites.Length > 0)
-                iconImage.sprite = config.stageSprites[0];
-
+            iconImage.sprite = firstStageSprite;
             iconImage.color = unlocked ? Color.white : Color.black;
         }
 
         if (silhouetteImage != null)
+        {
+            silhouetteImage.sprite = firstStageSprite;
             silhouetteImage.gameObject.SetActive(!unlocked);
+            silhouetteImage.color = Color.black;
+        }
 
         if (buyButton != null)
             buyButton.interactable = unlocked && hasSpace;
+    }
+
+    private Sprite GetFirstStageSprite()
+    {
+        if (config == null)
+            return null;
+
+        if (config.stages == null)
+            return null;
+
+        if (config.stages.Length == 0)
+            return null;
+
+        if (config.stages[0] == null)
+            return null;
+
+        return config.stages[0].sprite;
     }
 
     private void Buy()

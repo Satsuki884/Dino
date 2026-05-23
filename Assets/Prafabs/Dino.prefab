@@ -702,7 +702,7 @@ MonoBehaviour:
   growthSlider: {fileID: 6008891838706819883}
   levelText: {fileID: 5420667931163496435}
   config: {fileID: 0}
-  currentStage: 1
+  currentStage: 3
   satiety: 30
   growthExperience: 0
 --- !u!58 &1005154453728950296

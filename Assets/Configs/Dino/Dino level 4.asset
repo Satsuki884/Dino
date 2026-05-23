@@ -13,15 +13,23 @@ MonoBehaviour:
   m_Name: Dino level 4
   m_EditorClassIdentifier: Assembly-CSharp::DinoConfig
   level: 4
-  dinoName: Dino
-  stageSprites:
-  - {fileID: -974494812864979246, guid: 675d8366b95a4f146adfc24a6df8ea76, type: 3}
-  - {fileID: -974494812864979246, guid: 675d8366b95a4f146adfc24a6df8ea76, type: 3}
-  - {fileID: -974494812864979246, guid: 675d8366b95a4f146adfc24a6df8ea76, type: 3}
-  buyPrice: 50
-  growthExperienceToNextStage: 100
-  experiencePerSecondWhenFed: 2
-  startSatiety: 30
-  satietyLossPerSecond: 1
-  coinsPerSecond: 1
+  dinoName: Dino level 4
+  buyPrice: 125
+  startCalories: 1500
   moveSpeed: 1.2
+  stages:
+  - stageName: Stage 1
+    sprite: {fileID: -974494812864979246, guid: 675d8366b95a4f146adfc24a6df8ea76, type: 3}
+    ticksToNextStage: 25
+    caloriesConsumePerTick: 24
+    coinsPerTick: 1
+  - stageName: Stage 2
+    sprite: {fileID: -974494812864979246, guid: 675d8366b95a4f146adfc24a6df8ea76, type: 3}
+    ticksToNextStage: 45
+    caloriesConsumePerTick: 20
+    coinsPerTick: 17
+  - stageName: Stage 3
+    sprite: {fileID: -974494812864979246, guid: 675d8366b95a4f146adfc24a6df8ea76, type: 3}
+    ticksToNextStage: 0
+    caloriesConsumePerTick: 16
+    coinsPerTick: 50

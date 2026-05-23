@@ -8,35 +8,47 @@ public class Dino : MonoBehaviour
     public SpriteRenderer spriteRenderer;
 
     [Header("UI Above Head")]
-    public Slider satietySlider;
+    public Slider caloriesSlider;
     public Slider growthSlider;
     public TMP_Text levelText;
 
     [Header("Runtime Info")]
     [SerializeField] private DinoConfig config;
     [SerializeField] private int currentStage = 1;
-    [SerializeField] private float satiety;
-    [SerializeField] private float growthExperience;
+    [SerializeField] private float calories;
+    [SerializeField] private float growthTicks;
 
     private Vector2 moveDirection;
     private bool isDragging;
-    private float coinTimer;
+    private float tickTimer;
 
     public int Level => config != null ? config.level : 0;
     public int Stage => currentStage;
+
+    private DinoStageData CurrentStageData
+    {
+        get
+        {
+            if (config == null)
+                return null;
+
+            if (config.stages == null || config.stages.Length == 0)
+                return null;
+
+            int index = Mathf.Clamp(currentStage - 1, 0, config.stages.Length - 1);
+            return config.stages[index];
+        }
+    }
 
     private void Update()
     {
         if (config == null)
             return;
 
-        LoseSatiety();
-
         if (!isDragging)
             Move();
 
-        HandleGrowth();
-        HandleCoins();
+        HandleTick();
 
         UpdateUI();
     }
@@ -44,11 +56,11 @@ public class Dino : MonoBehaviour
     public void Init(DinoConfig newConfig, int startStage)
     {
         config = newConfig;
-        currentStage = startStage;
+        currentStage = Mathf.Max(1, startStage);
 
-        satiety = config.startSatiety;
-        growthExperience = 0f;
-        coinTimer = 0f;
+        calories = config.startCalories;
+        growthTicks = 0f;
+        tickTimer = 0f;
 
         moveDirection = Random.insideUnitCircle.normalized;
 
@@ -64,23 +76,114 @@ public class Dino : MonoBehaviour
         isDragging = value;
     }
 
-    private void LoseSatiety()
+    private void HandleTick()
     {
-        if (satiety <= 0f)
+        tickTimer += Time.deltaTime;
+
+        if (tickTimer < 1f)
+            return;
+
+        int ticksPassed = Mathf.FloorToInt(tickTimer);
+        tickTimer -= ticksPassed;
+
+        for (int i = 0; i < ticksPassed; i++)
         {
-            satiety = 0f;
+            ProcessOneTick();
+        }
+    }
+
+    private void ProcessOneTick()
+    {
+        DinoStageData stageData = CurrentStageData;
+
+        if (stageData == null)
+            return;
+
+        if (calories <= 0f)
+        {
+            calories = 0f;
             return;
         }
 
-        satiety -= config.satietyLossPerSecond * Time.deltaTime;
+        calories -= stageData.caloriesConsumePerTick;
 
-        if (satiety < 0f)
-            satiety = 0f;
+        if (calories < 0f)
+            calories = 0f;
+
+        AddCoinsForCurrentStage(stageData);
+
+        AddGrowthForCurrentStage(stageData);
     }
 
-    private bool HasSatiety()
+    private void AddCoinsForCurrentStage(DinoStageData stageData)
     {
-        return satiety > 0f;
+        if (GameManager.Instance == null)
+            return;
+
+        if (stageData.coinsPerTick <= 0f)
+            return;
+
+        GameManager.Instance.AddCoins(stageData.coinsPerTick);
+    }
+
+    private void AddGrowthForCurrentStage(DinoStageData stageData)
+    {
+        if (IsFinalStage())
+            return;
+
+        if (stageData.ticksToNextStage <= 0f)
+            return;
+
+        growthTicks += 1f;
+
+        if (growthTicks >= stageData.ticksToNextStage)
+        {
+            growthTicks = 0f;
+            TryGrowToNextStage();
+        }
+    }
+
+    public bool Feed(FoodConfig food)
+    {
+        if (food == null)
+            return false;
+
+        calories += food.satietyValue;
+
+        if (food.bonusGrowthExperience > 0f && !IsFinalStage())
+        {
+            growthTicks += food.bonusGrowthExperience;
+
+            DinoStageData stageData = CurrentStageData;
+
+            while (stageData != null &&
+                   !IsFinalStage() &&
+                   stageData.ticksToNextStage > 0f &&
+                   growthTicks >= stageData.ticksToNextStage)
+            {
+                growthTicks -= stageData.ticksToNextStage;
+                TryGrowToNextStage();
+                stageData = CurrentStageData;
+            }
+        }
+
+        UpdateUI();
+
+        return true;
+    }
+
+    private void TryGrowToNextStage()
+    {
+        if (IsFinalStage())
+            return;
+
+        currentStage++;
+
+        UpdateVisual();
+        UpdateUI();
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.RegisterDiscoveredStage(config, currentStage);
     }
 
     private void Move()
@@ -124,75 +227,6 @@ public class Dino : MonoBehaviour
             spriteRenderer.flipX = moveDirection.x < 0;
     }
 
-    private void HandleGrowth()
-    {
-        if (IsFinalStage())
-            return;
-
-        if (!HasSatiety())
-            return;
-
-        growthExperience += config.experiencePerSecondWhenFed * Time.deltaTime;
-
-        if (growthExperience >= config.growthExperienceToNextStage)
-        {
-            TryGrowToNextStage();
-        }
-    }
-
-    private void HandleCoins()
-    {
-        if (!HasSatiety())
-            return;
-
-        coinTimer += Time.deltaTime;
-
-        if (coinTimer >= 1f)
-        {
-            coinTimer = 0f;
-
-            if (GameManager.Instance != null)
-                GameManager.Instance.AddCoins(config.coinsPerSecond);
-        }
-    }
-
-    public bool Feed(FoodConfig food)
-    {
-        if (food == null)
-            return false;
-
-        satiety += food.satietyValue;
-
-        growthExperience += food.bonusGrowthExperience;
-
-        while (growthExperience >= config.growthExperienceToNextStage && !IsFinalStage())
-        {
-            growthExperience -= config.growthExperienceToNextStage;
-            TryGrowToNextStage();
-        }
-
-        if (IsFinalStage())
-            growthExperience = config.growthExperienceToNextStage;
-
-        UpdateUI();
-
-        return true;
-    }
-
-    private void TryGrowToNextStage()
-    {
-        if (IsFinalStage())
-            return;
-
-        currentStage++;
-
-        UpdateVisual();
-        UpdateUI();
-
-        if (GameManager.Instance != null)
-            GameManager.Instance.RegisterDiscoveredStage(config, currentStage);
-    }
-
     public bool CanMergeWith(Dino other)
     {
         if (other == null)
@@ -218,13 +252,33 @@ public class Dino : MonoBehaviour
         if (config == null)
             return false;
 
-        if (config.stageSprites == null)
+        if (config.stages == null)
             return false;
 
-        if (config.stageSprites.Length == 0)
+        if (config.stages.Length == 0)
             return false;
 
-        return currentStage >= config.stageSprites.Length;
+        return currentStage >= config.stages.Length;
+    }
+
+    public float GetCurrentCoinsPerTick()
+    {
+        DinoStageData stageData = CurrentStageData;
+
+        if (stageData == null)
+            return 0f;
+
+        return stageData.coinsPerTick;
+    }
+
+    public string GetCurrentStageName()
+    {
+        DinoStageData stageData = CurrentStageData;
+
+        if (stageData == null)
+            return "Stage " + currentStage;
+
+        return stageData.stageName;
     }
 
     private void UpdateVisual()
@@ -232,34 +286,32 @@ public class Dino : MonoBehaviour
         if (spriteRenderer == null)
             return;
 
-        if (config == null)
+        DinoStageData stageData = CurrentStageData;
+
+        if (stageData == null)
             return;
 
-        if (config.stageSprites == null || config.stageSprites.Length == 0)
-            return;
-
-        int spriteIndex = Mathf.Clamp(currentStage - 1, 0, config.stageSprites.Length - 1);
-        spriteRenderer.sprite = config.stageSprites[spriteIndex];
+        spriteRenderer.sprite = stageData.sprite;
     }
 
     private void UpdateUI()
     {
-        UpdateSatietyUI();
+        UpdateCaloriesUI();
         UpdateGrowthUI();
         UpdateLevelText();
     }
 
-    private void UpdateSatietyUI()
+    private void UpdateCaloriesUI()
     {
-        if (satietySlider == null)
+        if (caloriesSlider == null)
             return;
 
-        bool shouldShowSatietyBar = satiety <= 0f;
+        bool shouldShowCaloriesBar = calories <= 0f;
 
-        satietySlider.gameObject.SetActive(shouldShowSatietyBar);
+        caloriesSlider.gameObject.SetActive(shouldShowCaloriesBar);
 
-        if (shouldShowSatietyBar)
-            satietySlider.value = 0f;
+        if (shouldShowCaloriesBar)
+            caloriesSlider.value = 0f;
     }
 
     private void UpdateGrowthUI()
@@ -267,7 +319,9 @@ public class Dino : MonoBehaviour
         if (growthSlider == null)
             return;
 
-        if (config == null)
+        DinoStageData stageData = CurrentStageData;
+
+        if (stageData == null)
         {
             growthSlider.value = 0f;
             return;
@@ -275,17 +329,19 @@ public class Dino : MonoBehaviour
 
         if (IsFinalStage())
         {
-            growthSlider.value = 1f;
+            growthSlider.gameObject.SetActive(false);
             return;
         }
 
-        if (config.growthExperienceToNextStage <= 0f)
+        growthSlider.gameObject.SetActive(true);
+
+        if (stageData.ticksToNextStage <= 0f)
         {
             growthSlider.value = 0f;
             return;
         }
 
-        growthSlider.value = growthExperience / config.growthExperienceToNextStage;
+        growthSlider.value = growthTicks / stageData.ticksToNextStage;
     }
 
     private void UpdateLevelText()
@@ -293,53 +349,24 @@ public class Dino : MonoBehaviour
         if (levelText == null)
             return;
 
-        levelText.text = "Lv." + Level + "  St." + currentStage;
+        if (IsMaxDino())
+        {
+            levelText.text = "MAX";
+        }
+        else
+        {
+            levelText.text = "Lv." + Level + "  " + GetCurrentStageName();
+        }
+    }
+
+    public bool IsMaxDino()
+    {
+        if (!IsFinalStage())
+            return false;
+
+        if (GameManager.Instance == null)
+            return false;
+
+        return GameManager.Instance.IsMaxDinoLevel(Level);
     }
 }
-/*
-    private void OnMouseDown()
-    {
-        StartDrag();
-    }
-
-    private void OnMouseDrag()
-    {
-        Drag();
-    }
-
-    private void OnMouseUp()
-    {
-        EndDrag();
-    }
-
-    private void StartDrag()
-    {
-        isDragging = true;
-
-        Vector3 mouseWorld = GetPointerWorldPosition();
-        dragOffset = transform.position - mouseWorld;
-    }
-
-    private void Drag()
-    {
-        if (!isDragging)
-            return;
-
-        Vector3 pointerWorld = GetPointerWorldPosition();
-        Vector3 targetPosition = pointerWorld + dragOffset;
-        targetPosition.z = 0f;
-
-        transform.position = targetPosition;
-    }
-
-    private void EndDrag()
-    {
-        isDragging = false;
-
-        Dino target = FindMergeTarget();
-
-        if (target != null)
-        {
-            GameManager.Instance.MergeDinos(this, target);
-        }
-    } */
