@@ -45,21 +45,21 @@ public class DiscoveryPopupUI : MonoBehaviour
             dinoIcon.sprite = stageData.sprite;
 
         if (titleText != null)
-            titleText.text = "Новий дракончик відкритий!";
+            titleText.text = "New Dinosaur Discovered!";
 
         if (levelText != null)
-            levelText.text = "Рівень: " + config.level;
+            levelText.text = "Level: " + config.level;
 
         if (stageText != null)
         {
             string stageName = stageData != null ? stageData.stageName : stage.ToString();
-            stageText.text = "Стадія: " + stageName;
+            stageText.text = "Stage: " + stageName;
         }
 
         if (coinsText != null)
         {
             float coins = stageData != null ? stageData.coinsPerTick : 0f;
-            coinsText.text = "Монеток за секунду: " + coins;
+            coinsText.text = "Coins per Second: " + coins;
         }
     }
 
