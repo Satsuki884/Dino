@@ -480,6 +480,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2615846956999481488}
   - component: {fileID: 8165959596625513077}
+  - component: {fileID: 5251138224523298256}
+  - component: {fileID: 1221031818216678198}
   m_Layer: 5
   m_Name: DragArea
   m_TagString: Untagged
@@ -519,7 +521,47 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DraggableFoodUI
   dragIconPrefab: {fileID: 1541918911047831943, guid: 0eac44fb4ac38f24b93774d7fb7da6c0, type: 3}
-  rootCanvas: {fileID: 0}
+  disableScrollWhileDragging: 1
+  closeInventoryWhenDraggedOutside: 1
+  showDebugLogs: 1
+--- !u!222 &5251138224523298256
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6823995533539440500}
+  m_CullTransparentMesh: 1
+--- !u!114 &1221031818216678198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6823995533539440500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &8200215348432000218
 GameObject:
   m_ObjectHideFlags: 0
