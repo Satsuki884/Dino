@@ -48,6 +48,7 @@ public class GameManager : MonoBehaviour
     }
 
     private readonly List<Dino> activeDinos = new List<Dino>();
+    public IReadOnlyList<Dino> ActiveDinos => activeDinos;
 
     private int highestUnlockedLevel = 1;
 
@@ -317,10 +318,27 @@ public class GameManager : MonoBehaviour
             if (dino == null)
                 continue;
 
-            if (dino.IsInRaid())
-                continue;
+            DinoSaveData dinoData = dino.GetSaveData();
 
-            data.dinos.Add(dino.GetSaveData());
+            if (RaidManager.Instance != null &&
+                RaidManager.Instance.TryGetRaidEntryForDino(dino, out RaidEntry raidEntry))
+            {
+                dinoData.isInRaid = true;
+
+                dinoData.raidTimeLeft = raidEntry.timeLeft;
+                dinoData.raidDuration = raidEntry.raidDuration;
+                dinoData.raidRewardCoins = raidEntry.rewardCoins;
+
+                dinoData.raidReturnPositionX = raidEntry.returnPosition.x;
+                dinoData.raidReturnPositionY = raidEntry.returnPosition.y;
+                dinoData.raidReturnPositionZ = raidEntry.returnPosition.z;
+            }
+            else
+            {
+                dinoData.isInRaid = false;
+            }
+
+            data.dinos.Add(dinoData);
         }
 
         if (FoodInventory.Instance != null)
@@ -339,6 +357,9 @@ public class GameManager : MonoBehaviour
             UpdateUI();
             return;
         }
+
+        long currentUnixTime = SaveManager.GetCurrentUnixTime();
+        float offlineSeconds = Mathf.Max(0f, currentUnixTime - data.lastSaveUnixTime);
 
         coins = data.coins;
         highestUnlockedLevel = Mathf.Max(1, data.highestUnlockedLevel);
@@ -361,9 +382,36 @@ public class GameManager : MonoBehaviour
                 dinoData.positionZ
             );
 
+            if (dinoData.isInRaid)
+            {
+                position = new Vector3(
+                    dinoData.raidReturnPositionX,
+                    dinoData.raidReturnPositionY,
+                    dinoData.raidReturnPositionZ
+                );
+            }
+
             Dino dino = Instantiate(dinoPrefab, position, Quaternion.identity, dinoParent);
             dino.LoadFromSave(config, dinoData);
             activeDinos.Add(dino);
+
+            if (dinoData.isInRaid && RaidManager.Instance != null)
+            {
+                Vector3 returnPosition = new Vector3(
+                    dinoData.raidReturnPositionX,
+                    dinoData.raidReturnPositionY,
+                    dinoData.raidReturnPositionZ
+                );
+
+                RaidManager.Instance.RestoreRaidDino(
+                    dino,
+                    returnPosition,
+                    dinoData.raidTimeLeft,
+                    dinoData.raidDuration,
+                    dinoData.raidRewardCoins,
+                    offlineSeconds
+                );
+            }
         }
 
         if (activeDinos.Count == 0)

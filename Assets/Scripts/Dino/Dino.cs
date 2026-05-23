@@ -581,4 +581,24 @@ public class Dino : MonoBehaviour
         return Mathf.Max(1f, config.timeToRaid);
     }
 
+    public float GetCalories()
+    {
+        return calories;
+    }
+
+    public float GetGrowthTicks()
+    {
+        return growthTicks;
+    }
+
+    public void LoadRuntimeState(int loadedStage, float loadedCalories, float loadedGrowthTicks)
+    {
+        currentStage = Mathf.Max(1, loadedStage);
+        calories = Mathf.Max(0f, loadedCalories);
+        growthTicks = Mathf.Max(0f, loadedGrowthTicks);
+
+        UpdateVisual();
+        UpdateUI();
+    }
+
 }

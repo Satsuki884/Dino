@@ -3,32 +3,28 @@
   "WorkspaceRootPath": "P:\\Dino\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|p:\\dino\\assets\\scripts\\dinotouchinput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\dinotouchinput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|P:\\Dino\\Assets\\Scripts\\RaidScripts\\RaidController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\RaidScripts\\RaidController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|P:\\Dino\\Assets\\Scripts\\RaidScripts\\RaidDinoView.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\RaidScripts\\RaidDinoView.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|P:\\Dino\\Assets\\Scripts\\RaidScripts\\RaidCoinsUI.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\RaidScripts\\RaidCoinsUI.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|p:\\dino\\assets\\scripts\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|p:\\dino\\assets\\scripts\\dino.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\dino.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|p:\\dino\\assets\\scripts\\dinotouchinputnew.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\dinotouchinputnew.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|p:\\dino\\assets\\scripts\\raidscripts\\raiddinoview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\raidscripts\\raiddinoview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|p:\\dino\\assets\\scripts\\dinotouchinput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\dinotouchinput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|p:\\dino\\assets\\scripts\\raidscripts\\raidcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\raidscripts\\raidcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|p:\\dino\\assets\\scripts\\raidscripts\\raidmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\raidscripts\\raidmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|p:\\dino\\assets\\scripts\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|p:\\dino\\assets\\scripts\\raidscripts\\raidsceneloader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -39,8 +35,8 @@
       "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\raidscripts\\raiddropzone.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|p:\\dino\\assets\\scripts\\raidscripts\\raidmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\raidscripts\\raidmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|p:\\dino\\assets\\scripts\\raidscripts\\raidcoinsui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\raidscripts\\raidcoinsui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -50,24 +46,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "RaidCoinsUI.cs",
-              "DocumentMoniker": "P:\\Dino\\Assets\\Scripts\\RaidScripts\\RaidCoinsUI.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\RaidScripts\\RaidCoinsUI.cs",
-              "ToolTip": "P:\\Dino\\Assets\\Scripts\\RaidScripts\\RaidCoinsUI.cs",
-              "RelativeToolTip": "Assets\\Scripts\\RaidScripts\\RaidCoinsUI.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAABAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "Dino.cs",
+              "DocumentMoniker": "P:\\Dino\\Assets\\Scripts\\Dino.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Dino.cs",
+              "ToolTip": "P:\\Dino\\Assets\\Scripts\\Dino.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Dino.cs",
+              "ViewState": "AgIAAOQBAAAAAAAAAAA7wPgBAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-23T14:47:48.487Z",
+              "WhenOpened": "2026-05-23T16:06:27.371Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "GameManager.cs",
               "DocumentMoniker": "P:\\Dino\\Assets\\Scripts\\GameManager.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\GameManager.cs",
@@ -75,44 +71,43 @@
               "RelativeToolTip": "Assets\\Scripts\\GameManager.cs",
               "ViewState": "AgIAANMAAAAAAAAAAAAAwA4BAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-23T14:38:21.356Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-23T14:38:21.356Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "RaidDinoView.cs",
               "DocumentMoniker": "P:\\Dino\\Assets\\Scripts\\RaidScripts\\RaidDinoView.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\RaidScripts\\RaidDinoView.cs",
               "ToolTip": "P:\\Dino\\Assets\\Scripts\\RaidScripts\\RaidDinoView.cs",
               "RelativeToolTip": "Assets\\Scripts\\RaidScripts\\RaidDinoView.cs",
-              "ViewState": "AgIAAA4AAAAAAAAAAAAAwDgAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAC8AAAAAAAAAAAAgwEwAAABTAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-23T13:35:52.694Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "RaidController.cs",
               "DocumentMoniker": "P:\\Dino\\Assets\\Scripts\\RaidScripts\\RaidController.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\RaidScripts\\RaidController.cs",
               "ToolTip": "P:\\Dino\\Assets\\Scripts\\RaidScripts\\RaidController.cs",
               "RelativeToolTip": "Assets\\Scripts\\RaidScripts\\RaidController.cs",
-              "ViewState": "AgIAAG8AAAAAAAAAAAAAwJEAAAAgAAAAAAAAAA==",
+              "ViewState": "AgIAAG8AAAAAAAAAAAAxwJEAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-23T13:34:56.127Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "DinoTouchInput.cs",
               "DocumentMoniker": "P:\\Dino\\Assets\\Scripts\\DinoTouchInput.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\DinoTouchInput.cs",
               "ToolTip": "P:\\Dino\\Assets\\Scripts\\DinoTouchInput.cs",
               "RelativeToolTip": "Assets\\Scripts\\DinoTouchInput.cs",
-              "ViewState": "AgIAAMMAAAAAAAAAAAAwwPEAAAAVAAAAAAAAAA==",
+              "ViewState": "AgIAANUAAAAAAAAAAAAwwPEAAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-23T13:33:10.509Z",
               "EditorCaption": ""
@@ -120,32 +115,6 @@
             {
               "$type": "Document",
               "DocumentIndex": 6,
-              "Title": "DinoTouchInputNew.cs",
-              "DocumentMoniker": "P:\\Dino\\Assets\\Scripts\\DinoTouchInputNew.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\DinoTouchInputNew.cs",
-              "ToolTip": "P:\\Dino\\Assets\\Scripts\\DinoTouchInputNew.cs",
-              "RelativeToolTip": "Assets\\Scripts\\DinoTouchInputNew.cs",
-              "ViewState": "AgIAAM0AAAAAAAAAAAAwwP8AAAAZAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-23T13:24:50.656Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "Dino.cs",
-              "DocumentMoniker": "P:\\Dino\\Assets\\Scripts\\Dino.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\Dino.cs",
-              "ToolTip": "P:\\Dino\\Assets\\Scripts\\Dino.cs",
-              "RelativeToolTip": "Assets\\Scripts\\Dino.cs",
-              "ViewState": "AgIAAIIBAAAAAAAAAAAswKoBAAAFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-23T13:23:19.135Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
               "Title": "RaidSceneLoader.cs",
               "DocumentMoniker": "P:\\Dino\\Assets\\Scripts\\RaidScripts\\RaidSceneLoader.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\RaidScripts\\RaidSceneLoader.cs",
@@ -153,12 +122,11 @@
               "RelativeToolTip": "Assets\\Scripts\\RaidScripts\\RaidSceneLoader.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAE8AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-23T12:40:43.287Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-23T12:40:43.287Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 7,
               "Title": "RaidDropZone.cs",
               "DocumentMoniker": "P:\\Dino\\Assets\\Scripts\\RaidScripts\\RaidDropZone.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\RaidScripts\\RaidDropZone.cs",
@@ -166,21 +134,32 @@
               "RelativeToolTip": "Assets\\Scripts\\RaidScripts\\RaidDropZone.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-23T12:34:09.873Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-23T12:34:09.873Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 4,
               "Title": "RaidManager.cs",
               "DocumentMoniker": "P:\\Dino\\Assets\\Scripts\\RaidScripts\\RaidManager.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\RaidScripts\\RaidManager.cs",
               "ToolTip": "P:\\Dino\\Assets\\Scripts\\RaidScripts\\RaidManager.cs",
               "RelativeToolTip": "Assets\\Scripts\\RaidScripts\\RaidManager.cs",
-              "ViewState": "AgIAADQAAAAAAAAAAAAswI0AAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-23T12:33:58.965Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "RaidCoinsUI.cs",
+              "DocumentMoniker": "P:\\Dino\\Assets\\Scripts\\RaidScripts\\RaidCoinsUI.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\RaidScripts\\RaidCoinsUI.cs",
+              "ToolTip": "P:\\Dino\\Assets\\Scripts\\RaidScripts\\RaidCoinsUI.cs",
+              "RelativeToolTip": "Assets\\Scripts\\RaidScripts\\RaidCoinsUI.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-23T14:47:48.487Z"
             }
           ]
         }
