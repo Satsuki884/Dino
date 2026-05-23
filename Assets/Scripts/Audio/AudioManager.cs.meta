@@ -12,6 +12,7 @@ MonoImporter:
   - drop_coin: {fileID: 8300000, guid: 4d3195962b33305408faec01851514ad, type: 3}
   - deploy_item: {fileID: 8300000, guid: 113dbf7be35021c45a6108b046197afe, type: 3}
   - pick_up_coin: {fileID: 8300000, guid: 00ee889054907a249ac7d156dbdd0588, type: 3}
+  - marge: {fileID: 8300000, guid: 7de91454bdd0c2d429fd6444acee3a20, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

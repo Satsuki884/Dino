@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 96431105655abf9499db9c09ad609373, type: 3}
-  m_Name: Food_Meat
+  m_Name: Food_T1
   m_EditorClassIdentifier: Assembly-CSharp::FoodConfig
-  foodName: Meat
+  foodName: T1
   icon: {fileID: -4906693884735968781, guid: a9b76c8da6df0dc46ac94b8721179488, type: 3}
-  price: 10
-  satietyValue: 25
-  bonusGrowthExperience: 2
+  price: 2
+  satietyValue: 10
+  bonusGrowthExperience: 0

@@ -22,7 +22,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip drop_coin;
     public AudioClip deploy_item;
     public AudioClip pick_up_coin;
-
+    public AudioClip marge;
 
     // ================= MUSIC =================
 
