@@ -12,14 +12,10 @@ public class DinoTouchInputNew : MonoBehaviour
     public float dragDistance = 5f;
     public float mergeRadius = 0.6f;
 
-    [Header("Raid")]
-    public RaidDropZone raidDropZone;
-
     private Camera mainCamera;
 
     private Dino selectedDino;
     private Vector3 dragOffset;
-    private Vector3 selectedDinoStartPosition;
 
     private bool isDragging;
     private Vector2 pointerStartPosition;
@@ -125,12 +121,7 @@ public class DinoTouchInputNew : MonoBehaviour
             if (dino == null)
                 continue;
 
-            if (dino.IsInRaid())
-                continue;
-
             selectedDino = dino;
-            selectedDinoStartPosition = selectedDino.transform.position;
-
             dragOffset = selectedDino.transform.position - worldPosition;
             isDragging = false;
 
@@ -168,13 +159,6 @@ public class DinoTouchInputNew : MonoBehaviour
             return;
 
         selectedDino.SetDragging(false);
-
-        if (TrySendSelectedDinoToRaid())
-        {
-            selectedDino = null;
-            isDragging = false;
-            return;
-        }
 
         if (isDragging)
             TryMergeSelectedDino();
@@ -232,29 +216,5 @@ public class DinoTouchInputNew : MonoBehaviour
             return false;
 
         return EventSystem.current.IsPointerOverGameObject();
-    }
-
-    private bool TrySendSelectedDinoToRaid()
-    {
-        if (!isDragging)
-            return false;
-
-        if (selectedDino == null)
-            return false;
-
-        if (selectedDino.IsInRaid())
-            return false;
-
-        if (raidDropZone == null)
-            return false;
-
-        if (RaidManager.Instance == null)
-            return false;
-
-        if (!raidDropZone.IsDinoInsideRaidZone(selectedDino))
-            return false;
-
-        RaidManager.Instance.AddDinoToRaid(selectedDino, selectedDinoStartPosition);
-        return true;
     }
 }

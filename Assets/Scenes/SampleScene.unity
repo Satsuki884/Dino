@@ -515,6 +515,7 @@ MonoBehaviour:
   foodInventoryPanel: {fileID: 1422603324}
   shopPanelRect: {fileID: 954285759}
   foodInventoryPanelRect: {fileID: 1447569065}
+  foodInventoryCanvasGroup: {fileID: 1422603326}
   shopButton: {fileID: 2030663557}
   foodButton: {fileID: 1936000363}
   shopCloseButton: {fileID: 1924952360}
@@ -1128,7 +1129,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 250, y: 300}
+  m_SizeDelta: {x: 250, y: 250}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &557740324
 MonoBehaviour:
@@ -1578,9 +1579,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e3656d27ed3cda40b9ef1557081e3c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DinoTouchInput
-  dinoLayerMask:
-    serializedVersion: 2
-    m_Bits: 8
+  blockInputOverUI: 1
 --- !u!4 &761663727
 Transform:
   m_ObjectHideFlags: 0
@@ -1847,8 +1846,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -50}
-  m_SizeDelta: {x: -1200, y: -300}
+  m_AnchoredPosition: {x: 0, y: -75}
+  m_SizeDelta: {x: -1200, y: -250}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &904027353
 MonoBehaviour:
@@ -1976,8 +1975,9 @@ MonoBehaviour:
   foodSlotPrefab: {fileID: 418400571528849789, guid: eed58c227bfe6524f9b38bd99c314f0b, type: 3}
   availableFoods:
   - {fileID: 11400000, guid: 7e2744dbf422b46478729285d2cc4ff8, type: 2}
-  - {fileID: 11400000, guid: d0ccd0fd4a950f042813a459ee7f2ffc, type: 2}
   - {fileID: 11400000, guid: 4c92035cc1b15944da4169525036b466, type: 2}
+  - {fileID: 11400000, guid: d0ccd0fd4a950f042813a459ee7f2ffc, type: 2}
+  - {fileID: 11400000, guid: 75d8c4ca5c787db4e9827062af34629c, type: 2}
 --- !u!4 &1073073505
 Transform:
   m_ObjectHideFlags: 0
@@ -2401,6 +2401,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1422603325}
+  - component: {fileID: 1422603326}
   m_Layer: 5
   m_Name: FoodInventoryPanel
   m_TagString: Untagged
@@ -2430,6 +2431,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -1000, y: -600}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &1422603326
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1422603324}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1443061257
 GameObject:
   m_ObjectHideFlags: 0
@@ -3457,7 +3470,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -4906693884735968781, guid: a9b76c8da6df0dc46ac94b8721179488, type: 3}
+  m_Sprite: {fileID: 8284731299311951861, guid: 504b54d283a1996468c3696ab66d9fd9, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

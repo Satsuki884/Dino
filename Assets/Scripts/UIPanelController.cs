@@ -17,6 +17,9 @@ public class UIPanelController : MonoBehaviour
     public RectTransform shopPanelRect;
     public RectTransform foodInventoryPanelRect;
 
+    [Header("Canvas Groups")]
+    public CanvasGroup foodInventoryCanvasGroup;
+
     [Header("Open Buttons")]
     public Button shopButton;
     public Button foodButton;
@@ -32,6 +35,7 @@ public class UIPanelController : MonoBehaviour
     private RectTransform currentOpenPanelRect;
 
     private bool ignoreNextOutsideClick;
+    private bool foodPanelHiddenDuringDrag;
 
     private void Awake()
     {
@@ -40,6 +44,9 @@ public class UIPanelController : MonoBehaviour
 
     private void Start()
     {
+        if (foodInventoryCanvasGroup == null && foodInventoryPanel != null)
+            foodInventoryCanvasGroup = foodInventoryPanel.GetComponent<CanvasGroup>();
+
         if (shopButton != null)
             shopButton.onClick.AddListener(OnShopButtonClicked);
 
@@ -57,6 +64,9 @@ public class UIPanelController : MonoBehaviour
 
     private void Update()
     {
+        if (DraggableFoodUI.IsDraggingFood)
+            return;
+
         if (!closeWhenClickOutside)
             return;
 
@@ -100,22 +110,18 @@ public class UIPanelController : MonoBehaviour
 
         ignoreNextOutsideClick = true;
 
-        // Якщо нічого не відкрито — відкриваємо натиснуту панель.
         if (currentOpenPanel == null)
         {
             OpenPanel(targetPanel, targetPanelRect);
             return;
         }
 
-        // Якщо натиснули кнопку тієї самої панелі — закриваємо її.
         if (currentOpenPanel == targetPanel)
         {
             CloseAllPanels();
             return;
         }
 
-        // Якщо відкрита інша панель — тільки закриваємо поточну.
-        // Нову панель гравець відкриє другим натисканням.
         CloseAllPanels();
     }
 
@@ -124,6 +130,9 @@ public class UIPanelController : MonoBehaviour
         CloseAllPanels();
 
         panel.SetActive(true);
+
+        if (panel == foodInventoryPanel)
+            ShowFoodPanelVisuals();
 
         currentOpenPanel = panel;
         currentOpenPanelRect = panelRect;
@@ -137,8 +146,120 @@ public class UIPanelController : MonoBehaviour
         if (foodInventoryPanel != null)
             foodInventoryPanel.SetActive(false);
 
+        ShowFoodPanelVisuals();
+
         currentOpenPanel = null;
         currentOpenPanelRect = null;
+        foodPanelHiddenDuringDrag = false;
+    }
+
+    public void CloseFoodPanelOnly()
+    {
+        if (foodInventoryPanel != null)
+            foodInventoryPanel.SetActive(false);
+
+        ShowFoodPanelVisuals();
+
+        if (currentOpenPanel == foodInventoryPanel)
+        {
+            currentOpenPanel = null;
+            currentOpenPanelRect = null;
+        }
+
+        foodPanelHiddenDuringDrag = false;
+    }
+
+    public void CloseShopPanelOnly()
+    {
+        if (shopPanel != null)
+            shopPanel.SetActive(false);
+
+        if (currentOpenPanel == shopPanel)
+        {
+            currentOpenPanel = null;
+            currentOpenPanelRect = null;
+        }
+    }
+
+    public void HideFoodPanelDuringDrag()
+    {
+        if (foodInventoryPanel == null)
+            return;
+
+        if (!foodInventoryPanel.activeSelf)
+            return;
+
+        if (foodInventoryCanvasGroup == null)
+            foodInventoryCanvasGroup = foodInventoryPanel.GetComponent<CanvasGroup>();
+
+        if (foodInventoryCanvasGroup == null)
+        {
+            Debug.LogWarning("FoodInventoryPanel has no CanvasGroup.");
+            return;
+        }
+
+        foodInventoryCanvasGroup.alpha = 0f;
+        foodInventoryCanvasGroup.interactable = false;
+        foodInventoryCanvasGroup.blocksRaycasts = false;
+
+        foodPanelHiddenDuringDrag = true;
+    }
+
+    public void FinishFoodPanelDragClose()
+    {
+        if (!foodPanelHiddenDuringDrag)
+            return;
+
+        if (foodInventoryPanel != null)
+            foodInventoryPanel.SetActive(false);
+
+        ShowFoodPanelVisuals();
+
+        if (currentOpenPanel == foodInventoryPanel)
+        {
+            currentOpenPanel = null;
+            currentOpenPanelRect = null;
+        }
+
+        foodPanelHiddenDuringDrag = false;
+    }
+
+    private void ShowFoodPanelVisuals()
+    {
+        if (foodInventoryCanvasGroup == null && foodInventoryPanel != null)
+            foodInventoryCanvasGroup = foodInventoryPanel.GetComponent<CanvasGroup>();
+
+        if (foodInventoryCanvasGroup == null)
+            return;
+
+        foodInventoryCanvasGroup.alpha = 1f;
+        foodInventoryCanvasGroup.interactable = true;
+        foodInventoryCanvasGroup.blocksRaycasts = true;
+    }
+
+    public RectTransform GetFoodPanelRect()
+    {
+        return foodInventoryPanelRect;
+    }
+
+    public RectTransform GetShopPanelRect()
+    {
+        return shopPanelRect;
+    }
+
+    public bool IsAnyPanelOpen()
+    {
+        return currentOpenPanel != null;
+    }
+
+    public bool IsFoodPanelOpen()
+    {
+        return currentOpenPanel == foodInventoryPanel;
+    }
+
+    public bool IsShopPanelOpen()
+    {
+        return currentOpenPanel == shopPanel;
     }
 
     private bool IsClickInsideRect(RectTransform rect, Vector2 screenPosition)
@@ -146,7 +267,11 @@ public class UIPanelController : MonoBehaviour
         if (rect == null)
             return false;
 
-        return RectTransformUtility.RectangleContainsScreenPoint(rect, screenPosition, null);
+        return RectTransformUtility.RectangleContainsScreenPoint(
+            rect,
+            screenPosition,
+            null
+        );
     }
 
     private bool IsClickOnButton(Vector2 screenPosition)
@@ -176,7 +301,11 @@ public class UIPanelController : MonoBehaviour
         if (rect == null)
             return false;
 
-        return RectTransformUtility.RectangleContainsScreenPoint(rect, screenPosition, null);
+        return RectTransformUtility.RectangleContainsScreenPoint(
+            rect,
+            screenPosition,
+            null
+        );
     }
 
     private bool WasPointerPressedThisFrame()
@@ -185,7 +314,8 @@ public class UIPanelController : MonoBehaviour
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
             return true;
 
-        if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
+        if (Touchscreen.current != null &&
+            Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
             return true;
 
         return false;
@@ -193,7 +323,8 @@ public class UIPanelController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
             return true;
 
-        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        if (Input.touchCount > 0 &&
+            Input.GetTouch(0).phase == TouchPhase.Began)
             return true;
 
         return false;
