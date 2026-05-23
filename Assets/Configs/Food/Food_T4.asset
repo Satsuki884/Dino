@@ -17,3 +17,4 @@ MonoBehaviour:
   price: 50
   satietyValue: 320
   bonusGrowthExperience: 2
+  requiredDinoLevel: 4
