@@ -26,6 +26,26 @@ public class GameManager : MonoBehaviour
 
     [Header("Shop")]
     public ShopManager shopManager;
+    [Header("Spawned Coins")]
+    public SpawnedCoin spawnedCoinPrefab;
+    public Transform spawnedCoinParent;
+
+    public void SpawnDroppedCoin(Vector3 position, int value)
+    {
+        if (value <= 0)
+            return;
+
+        if (spawnedCoinPrefab == null)
+        {
+            Debug.LogWarning("Spawned Coin Prefab is not assigned in GameManager.");
+            return;
+        }
+
+        Transform parent = spawnedCoinParent != null ? spawnedCoinParent : null;
+
+        SpawnedCoin coin = Instantiate(spawnedCoinPrefab, position, Quaternion.identity, parent);
+        coin.Init(value, 5f);
+    }
 
     private readonly List<Dino> activeDinos = new List<Dino>();
 

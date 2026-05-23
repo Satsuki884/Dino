@@ -678,6 +678,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 216774102}
   m_CullTransparentMesh: 1
+--- !u!1 &228943069
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 228943070}
+  m_Layer: 0
+  m_Name: CoinParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &228943070
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 228943069}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -909.7108, y: -479.70663, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 724411013}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &270305045
 GameObject:
   m_ObjectHideFlags: 0
@@ -1339,6 +1370,7 @@ Transform:
   - {fileID: 1296302594}
   - {fileID: 1551261996}
   - {fileID: 458965400}
+  - {fileID: 228943070}
   - {fileID: 9230230}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3551,6 +3583,8 @@ MonoBehaviour:
   coinsText: {fileID: 2106407413}
   dinoLimitText: {fileID: 1564230646}
   shopManager: {fileID: 1706448001}
+  spawnedCoinPrefab: {fileID: 1563370425878334551, guid: 85fe42ed91f2c7441ad5011b0ca5dea9, type: 3}
+  spawnedCoinParent: {fileID: 228943070}
 --- !u!4 &1766785956
 Transform:
   m_ObjectHideFlags: 0
