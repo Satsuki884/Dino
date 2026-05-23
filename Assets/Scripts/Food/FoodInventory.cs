@@ -24,22 +24,11 @@ public class FoodInventory : MonoBehaviour
     {
         foreach (FoodConfig food in availableFoods)
         {
-            if (food != null && !foodAmounts.ContainsKey(food))
+            if (!foodAmounts.ContainsKey(food))
                 foodAmounts.Add(food, 0);
         }
 
         BuildInventoryUI();
-    }
-
-    public bool IsFoodUnlocked(FoodConfig food)
-    {
-        if (food == null)
-            return false;
-
-        if (GameManager.Instance == null)
-            return false;
-
-        return GameManager.Instance.IsLevelUnlocked(food.requiredDinoLevel);
     }
 
     public void AddFood(FoodConfig food, int amount)
@@ -88,15 +77,6 @@ public class FoodInventory : MonoBehaviour
         if (food == null)
             return;
 
-        if (!IsFoodUnlocked(food))
-        {
-            Debug.Log("Food is locked: " + food.foodName);
-            return;
-        }
-
-        if (GameManager.Instance == null)
-            return;
-
         if (!GameManager.Instance.SpendCoins(food.price))
             return;
 
@@ -109,9 +89,6 @@ public class FoodInventory : MonoBehaviour
 
         foreach (FoodConfig food in availableFoods)
         {
-            if (food == null)
-                continue;
-
             FoodSlotUI slot = Instantiate(foodSlotPrefab, foodSlotParent);
             slot.Init(food);
             spawnedSlots.Add(slot);
@@ -124,8 +101,7 @@ public class FoodInventory : MonoBehaviour
     {
         foreach (FoodSlotUI slot in spawnedSlots)
         {
-            if (slot != null)
-                slot.Refresh();
+            slot.Refresh();
         }
     }
 
