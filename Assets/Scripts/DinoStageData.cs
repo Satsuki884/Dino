@@ -21,4 +21,8 @@ public class DinoStageData
 
     [Header("Movement")]
     public bool canMove = true;
+
+    [Header("Dropped Coins")]
+    public float spawnedCoinIntervalMin = 5f;
+    public float spawnedCoinIntervalMax = 10f;
 }

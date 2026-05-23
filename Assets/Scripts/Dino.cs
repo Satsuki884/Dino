@@ -18,6 +18,12 @@ public class Dino : MonoBehaviour
     [SerializeField] private float calories;
     [SerializeField] private float growthTicks;
 
+    [Header("Dropped Coins")]
+    public Vector2 droppedCoinRandomOffset = new Vector2(0.7f, 0.5f);
+
+    private float droppedCoinTimer;
+    private float nextDroppedCoinTime;
+
     private Vector2 moveDirection;
     private bool isDragging;
     private float tickTimer;
@@ -53,6 +59,7 @@ public class Dino : MonoBehaviour
             Move();
 
         HandleTick();
+        HandleDroppedCoinSpawn();
 
         UpdateUI();
     }
@@ -80,8 +87,79 @@ public class Dino : MonoBehaviour
         if (moveDirection == Vector2.zero)
             moveDirection = Vector2.right;
 
+        ScheduleNextDroppedCoin();
         UpdateVisual();
         UpdateUI();
+    }
+
+    private void ScheduleNextDroppedCoin()
+    {
+        DinoStageData stageData = CurrentStageData;
+
+        if (stageData == null)
+        {
+            nextDroppedCoinTime = 5f;
+            droppedCoinTimer = 0f;
+            return;
+        }
+
+        float min = Mathf.Max(0.5f, stageData.spawnedCoinIntervalMin);
+        float max = Mathf.Max(min, stageData.spawnedCoinIntervalMax);
+
+        nextDroppedCoinTime = Random.Range(min, max);
+        droppedCoinTimer = 0f;
+    }
+
+    private void HandleDroppedCoinSpawn()
+    {
+        if (!HasCalories())
+            return;
+
+        DinoStageData stageData = CurrentStageData;
+
+        if (stageData == null)
+            return;
+
+        droppedCoinTimer += Time.deltaTime;
+
+        if (droppedCoinTimer < nextDroppedCoinTime)
+            return;
+
+        droppedCoinTimer = 0f;
+
+        TrySpawnDroppedCoin(stageData);
+        ScheduleNextDroppedCoin();
+    }
+
+    private void TrySpawnDroppedCoin(DinoStageData stageData)
+    {
+        if (GameManager.Instance == null)
+            return;
+
+        int maxCoinValue = Mathf.FloorToInt(stageData.coinsPerTick);
+
+        if (maxCoinValue <= 0)
+            return;
+
+        int coinValue = Random.Range(0, maxCoinValue + 1);
+
+        if (coinValue <= 0)
+            return;
+
+        Vector3 offset = new Vector3(
+            Random.Range(-droppedCoinRandomOffset.x, droppedCoinRandomOffset.x),
+            Random.Range(-droppedCoinRandomOffset.y, droppedCoinRandomOffset.y),
+            0f
+        );
+
+        Vector3 spawnPosition = transform.position + offset;
+
+        GameManager.Instance.SpawnDroppedCoin(spawnPosition, coinValue);
+    }
+
+    private bool HasCalories()
+    {
+        return calories > 0f;
     }
 
     public void SetDragging(bool value)
