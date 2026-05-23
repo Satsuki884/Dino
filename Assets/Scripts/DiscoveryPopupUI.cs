@@ -33,23 +33,34 @@ public class DiscoveryPopupUI : MonoBehaviour
         if (root != null)
             root.SetActive(true);
 
-        if (dinoIcon != null && config.stageSprites != null && config.stageSprites.Length > 0)
+        DinoStageData stageData = null;
+
+        if (config.stages != null && config.stages.Length > 0)
         {
-            int index = Mathf.Clamp(stage - 1, 0, config.stageSprites.Length - 1);
-            dinoIcon.sprite = config.stageSprites[index];
+            int index = Mathf.Clamp(stage - 1, 0, config.stages.Length - 1);
+            stageData = config.stages[index];
         }
 
+        if (dinoIcon != null && stageData != null)
+            dinoIcon.sprite = stageData.sprite;
+
         if (titleText != null)
-            titleText.text = "Новий динозаврик відкритий!";
+            titleText.text = "New Dinosaur Discovered!";
 
         if (levelText != null)
-            levelText.text = "Рівень: " + config.level;
+            levelText.text = "Level: " + config.level;
 
         if (stageText != null)
-            stageText.text = "Стадія: " + stage;
+        {
+            string stageName = stageData != null ? stageData.stageName : stage.ToString();
+            stageText.text = "Stage: " + stageName;
+        }
 
         if (coinsText != null)
-            coinsText.text = "Монеток за секунду: " + config.coinsPerSecond;
+        {
+            float coins = stageData != null ? stageData.coinsPerTick : 0f;
+            coinsText.text = "Coins per Second: " + coins;
+        }
     }
 
     public void Hide()

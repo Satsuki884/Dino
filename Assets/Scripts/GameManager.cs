@@ -52,9 +52,23 @@ public class GameManager : MonoBehaviour
         UpdateUI();
     }
 
+    private float coinRemainder = 0f;
+
     public void AddCoins(float amount)
     {
-        coins += Mathf.FloorToInt(amount);
+        if (amount <= 0f)
+            return;
+
+        coinRemainder += amount;
+
+        int wholeCoins = Mathf.FloorToInt(coinRemainder);
+
+        if (wholeCoins <= 0)
+            return;
+
+        coins += wholeCoins;
+        coinRemainder -= wholeCoins;
+
         UpdateUI();
     }
 
@@ -230,5 +244,28 @@ public class GameManager : MonoBehaviour
 
         if (dinoLimitText != null)
             dinoLimitText.text = activeDinos.Count + " / " + maxDinosOnField;
+    }
+
+    public bool HasConfigForLevel(int level)
+    {
+        return GetConfigByLevel(level) != null;
+    }
+
+    public int GetMaxDinoLevel()
+    {
+        int maxLevel = 0;
+
+        foreach (DinoConfig config in dinoConfigs)
+        {
+            if (config != null && config.level > maxLevel)
+                maxLevel = config.level;
+        }
+
+        return maxLevel;
+    }
+
+    public bool IsMaxDinoLevel(int level)
+    {
+        return level >= GetMaxDinoLevel();
     }
 }
