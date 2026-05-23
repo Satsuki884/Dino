@@ -60,11 +60,24 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        SpawnDino(1, 1, GetRandomPointInField());
-        UpdateUI();
+        if (SaveManager.HasSave())
+        {
+            LoadGame();
+        }
+        else
+        {
+            SpawnDino(1, 1, GetRandomPointInField());
+            UpdateUI();
+        }
 
         if (shopManager != null)
+        {
             shopManager.BuildShop();
+            shopManager.RefreshShop();
+        }
+
+        if (FoodInventory.Instance != null)
+            FoodInventory.Instance.RefreshInventoryUI();
     }
 
     private void Update()
@@ -290,5 +303,106 @@ public class GameManager : MonoBehaviour
     public bool IsMaxDinoLevel(int level)
     {
         return level >= GetMaxDinoLevel();
+    }
+
+    public void SaveGame()
+    {
+        GameSaveData data = new GameSaveData();
+
+        data.coins = coins;
+        data.highestUnlockedLevel = highestUnlockedLevel;
+
+        foreach (Dino dino in activeDinos)
+        {
+            if (dino == null)
+                continue;
+
+            if (dino.IsInRaid())
+                continue;
+
+            data.dinos.Add(dino.GetSaveData());
+        }
+
+        if (FoodInventory.Instance != null)
+            data.foods = FoodInventory.Instance.GetSaveData();
+
+        SaveManager.Save(data);
+    }
+
+    public void LoadGame()
+    {
+        GameSaveData data = SaveManager.Load();
+
+        if (data == null)
+        {
+            SpawnDino(1, 1, GetRandomPointInField());
+            UpdateUI();
+            return;
+        }
+
+        coins = data.coins;
+        highestUnlockedLevel = Mathf.Max(1, data.highestUnlockedLevel);
+
+        ClearAllDinos();
+
+        foreach (DinoSaveData dinoData in data.dinos)
+        {
+            if (dinoData == null)
+                continue;
+
+            DinoConfig config = GetConfigByLevel(dinoData.level);
+
+            if (config == null)
+                continue;
+
+            Vector3 position = new Vector3(
+                dinoData.positionX,
+                dinoData.positionY,
+                dinoData.positionZ
+            );
+
+            Dino dino = Instantiate(dinoPrefab, position, Quaternion.identity, dinoParent);
+            dino.LoadFromSave(config, dinoData);
+            activeDinos.Add(dino);
+        }
+
+        if (activeDinos.Count == 0)
+            SpawnDino(1, 1, GetRandomPointInField());
+
+        if (FoodInventory.Instance != null)
+            FoodInventory.Instance.LoadFromSave(data.foods);
+
+        UpdateUI();
+
+        if (shopManager != null)
+            shopManager.RefreshShop();
+    }
+
+    private void ClearAllDinos()
+    {
+        foreach (Dino dino in activeDinos)
+        {
+            if (dino != null)
+                Destroy(dino.gameObject);
+        }
+
+        activeDinos.Clear();
+    }
+
+    private void OnApplicationQuit()
+    {
+        SaveGame();
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause)
+            SaveGame();
+    }
+
+    [ContextMenu("Delete Save")]
+    public void DeleteSaveForTest()
+    {
+        SaveManager.DeleteSave();
     }
 }

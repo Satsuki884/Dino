@@ -517,12 +517,48 @@ public class Dino : MonoBehaviour
         return stageData.sprite;
     }
 
+    public DinoSaveData GetSaveData()
+    {
+        DinoSaveData data = new DinoSaveData();
+
+        data.level = Level;
+        data.stage = Stage;
+
+        data.positionX = transform.position.x;
+        data.positionY = transform.position.y;
+        data.positionZ = transform.position.z;
+
+        data.calories = calories;
+        data.growthTicks = growthTicks;
+
+        return data;
+    }
+
+    public void LoadFromSave(DinoConfig savedConfig, DinoSaveData data)
+    {
+        if (savedConfig == null || data == null)
+            return;
+
+        Init(savedConfig, data.stage);
+
+        calories = data.calories;
+        growthTicks = data.growthTicks;
+
+        transform.position = new Vector3(
+            data.positionX,
+            data.positionY,
+            data.positionZ
+        );
+
+        UpdateVisual();
+        UpdateUI();
+    }
+
     public bool CanGoToRaid()
     {
         if (isInRaid)
             return false;
 
-        // Динозавр 1 стадии не может идти в рейд
         if (Stage <= 1)
             return false;
 
@@ -544,4 +580,5 @@ public class Dino : MonoBehaviour
 
         return Mathf.Max(1f, config.timeToRaid);
     }
+
 }

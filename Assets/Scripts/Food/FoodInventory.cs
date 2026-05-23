@@ -139,4 +139,63 @@ public class FoodInventory : MonoBehaviour
 
         spawnedSlots.Clear();
     }
+
+    public List<FoodSaveData> GetSaveData()
+    {
+        List<FoodSaveData> data = new List<FoodSaveData>();
+
+        foreach (FoodConfig food in availableFoods)
+        {
+            if (food == null)
+                continue;
+
+            FoodSaveData foodData = new FoodSaveData();
+            foodData.foodName = food.foodName;
+            foodData.amount = GetFoodAmount(food);
+
+            data.Add(foodData);
+        }
+
+        return data;
+    }
+
+    public void LoadFromSave(List<FoodSaveData> savedFoods)
+    {
+        if (savedFoods == null)
+            return;
+
+        foodAmounts.Clear();
+
+        foreach (FoodConfig food in availableFoods)
+        {
+            if (food != null && !foodAmounts.ContainsKey(food))
+                foodAmounts.Add(food, 0);
+        }
+
+        foreach (FoodSaveData savedFood in savedFoods)
+        {
+            if (savedFood == null)
+                continue;
+
+            FoodConfig config = GetFoodByName(savedFood.foodName);
+
+            if (config == null)
+                continue;
+
+            foodAmounts[config] = savedFood.amount;
+        }
+
+        RefreshInventoryUI();
+    }
+
+    private FoodConfig GetFoodByName(string foodName)
+    {
+        foreach (FoodConfig food in availableFoods)
+        {
+            if (food != null && food.foodName == foodName)
+                return food;
+        }
+
+        return null;
+    }
 }
