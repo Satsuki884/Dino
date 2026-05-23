@@ -16,9 +16,9 @@ public class DinoConfig : ScriptableObject
     [Header("Movement")]
     public float moveSpeed = 1.2f;
 
-    [Header("Stages")]
-    public DinoStageData[] stages;
-
     [Header("Balance")]
     public float growthTimeMultiplier = 2f;
+
+    [Header("Stages")]
+    public DinoStageData[] stages;
 }
