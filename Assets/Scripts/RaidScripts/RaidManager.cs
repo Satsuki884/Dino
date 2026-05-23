@@ -122,6 +122,60 @@ public class RaidManager : MonoBehaviour
 
         return false;
     }
+
+    public bool TryGetRaidEntryForDino(Dino dino, out RaidEntry foundEntry)
+    {
+        foreach (RaidEntry entry in activeRaids)
+        {
+            if (entry != null && entry.dino == dino)
+            {
+                foundEntry = entry;
+                return true;
+            }
+        }
+
+        foundEntry = null;
+        return false;
+    }
+
+    public void RestoreRaidDino(
+    Dino dino,
+    Vector3 returnPosition,
+    float savedTimeLeft,
+    float raidDuration,
+    float rewardCoins,
+    float offlineSeconds
+)
+    {
+        if (dino == null)
+            return;
+
+        float newTimeLeft = savedTimeLeft - offlineSeconds;
+
+        if (newTimeLeft <= 0f)
+        {
+            if (GameManager.Instance != null)
+                GameManager.Instance.AddCoins(rewardCoins);
+
+            dino.EndRaidMode(returnPosition);
+
+            OnRaidsChanged?.Invoke();
+            return;
+        }
+
+        RaidEntry entry = new RaidEntry();
+        entry.dino = dino;
+        entry.returnPosition = returnPosition;
+        entry.raidDuration = raidDuration;
+        entry.timeLeft = newTimeLeft;
+        entry.rewardCoins = rewardCoins;
+
+        activeRaids.Add(entry);
+
+        dino.StartRaidMode();
+
+        OnRaidsChanged?.Invoke();
+    }
 }
 
 [System.Serializable]

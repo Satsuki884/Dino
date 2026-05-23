@@ -26,6 +26,16 @@ public class DinoSaveData
 
     public float calories;
     public float growthTicks;
+
+    public bool isInRaid;
+
+    public float raidTimeLeft;
+    public float raidDuration;
+    public float raidRewardCoins;
+
+    public float raidReturnPositionX;
+    public float raidReturnPositionY;
+    public float raidReturnPositionZ;
 }
 
 [Serializable]
