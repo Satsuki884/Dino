@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Food_T3
   m_EditorClassIdentifier: Assembly-CSharp::FoodConfig
   foodName: T3
-  icon: {fileID: -4906693884735968781, guid: a9b76c8da6df0dc46ac94b8721179488, type: 3}
+  icon: {fileID: -5441841738291930802, guid: cef5283f08639594c856c64953495549, type: 3}
   price: 20
   satietyValue: 120
   bonusGrowthExperience: 5
