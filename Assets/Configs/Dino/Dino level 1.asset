@@ -21,9 +21,7 @@ MonoBehaviour:
   buyPrice: 50
   growthExperienceToNextStage: 100
   experiencePerSecondWhenFed: 2
-  maxSatiety: 100
+  startSatiety: 30
   satietyLossPerSecond: 1
-  satietyPerFood: 35
-  minSatietyForGrowth: 25
   coinsPerSecond: 1
   moveSpeed: 1.2

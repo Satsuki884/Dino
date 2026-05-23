@@ -18,10 +18,8 @@ public class DinoConfig : ScriptableObject
     public float experiencePerSecondWhenFed = 4f;
 
     [Header("Food")]
-    public float maxSatiety = 100f;
+    public float startSatiety = 0f;
     public float satietyLossPerSecond = 1f;
-    public float satietyPerFood = 35f;
-    public float minSatietyForGrowth = 25f;
 
     [Header("Coins")]
     public float coinsPerSecond = 1f;

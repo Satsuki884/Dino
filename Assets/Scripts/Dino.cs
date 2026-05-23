@@ -20,32 +20,10 @@ public class Dino : MonoBehaviour
 
     private Vector2 moveDirection;
     private bool isDragging;
-    private Camera mainCamera;
-    private Vector3 dragOffset;
-
     private float coinTimer;
 
-    public int Level => config.level;
+    public int Level => config != null ? config.level : 0;
     public int Stage => currentStage;
-
-    private void Awake()
-    {
-        mainCamera = Camera.main;
-    }
-
-    public void Init(DinoConfig newConfig, int startStage)
-    {
-        config = newConfig;
-        currentStage = startStage;
-
-        satiety = config.maxSatiety;
-        growthExperience = 0f;
-
-        moveDirection = Random.insideUnitCircle.normalized;
-
-        UpdateVisual();
-        UpdateUI();
-    }
 
     private void Update()
     {
@@ -63,53 +41,86 @@ public class Dino : MonoBehaviour
         UpdateUI();
     }
 
+    public void Init(DinoConfig newConfig, int startStage)
+    {
+        config = newConfig;
+        currentStage = startStage;
+
+        satiety = config.startSatiety;
+        growthExperience = 0f;
+        coinTimer = 0f;
+
+        moveDirection = Random.insideUnitCircle.normalized;
+
+        if (moveDirection == Vector2.zero)
+            moveDirection = Vector2.right;
+
+        UpdateVisual();
+        UpdateUI();
+    }
+
+    public void SetDragging(bool value)
+    {
+        isDragging = value;
+    }
+
     private void LoseSatiety()
     {
+        if (satiety <= 0f)
+        {
+            satiety = 0f;
+            return;
+        }
+
         satiety -= config.satietyLossPerSecond * Time.deltaTime;
-        satiety = Mathf.Clamp(satiety, 0f, config.maxSatiety);
+
+        if (satiety < 0f)
+            satiety = 0f;
+    }
+
+    private bool HasSatiety()
+    {
+        return satiety > 0f;
     }
 
     private void Move()
     {
+        if (GameManager.Instance == null)
+            return;
+
         transform.position += (Vector3)(moveDirection * config.moveSpeed * Time.deltaTime);
 
         Bounds bounds = GameManager.Instance.GetFieldBounds();
         Vector3 position = transform.position;
 
-        bool changedDirection = false;
-
         if (position.x < bounds.min.x)
         {
             position.x = bounds.min.x;
             moveDirection.x = Mathf.Abs(moveDirection.x);
-            changedDirection = true;
         }
         else if (position.x > bounds.max.x)
         {
             position.x = bounds.max.x;
             moveDirection.x = -Mathf.Abs(moveDirection.x);
-            changedDirection = true;
         }
 
         if (position.y < bounds.min.y)
         {
             position.y = bounds.min.y;
             moveDirection.y = Mathf.Abs(moveDirection.y);
-            changedDirection = true;
         }
         else if (position.y > bounds.max.y)
         {
             position.y = bounds.max.y;
             moveDirection.y = -Mathf.Abs(moveDirection.y);
-            changedDirection = true;
         }
 
         transform.position = position;
 
-        if (changedDirection)
-            moveDirection = moveDirection.normalized;
+        if (moveDirection != Vector2.zero)
+            moveDirection.Normalize();
 
-        if (moveDirection.x != 0)
+        if (spriteRenderer != null && moveDirection.x != 0)
             spriteRenderer.flipX = moveDirection.x < 0;
     }
 
@@ -118,7 +129,7 @@ public class Dino : MonoBehaviour
         if (IsFinalStage())
             return;
 
-        if (GetSatietyPercent() < config.minSatietyForGrowth)
+        if (!HasSatiety())
             return;
 
         growthExperience += config.experiencePerSecondWhenFed * Time.deltaTime;
@@ -129,23 +140,9 @@ public class Dino : MonoBehaviour
         }
     }
 
-    private void TryGrowToNextStage()
-    {
-        if (IsFinalStage())
-            return;
-
-        growthExperience = 0f;
-        currentStage++;
-
-        UpdateVisual();
-        UpdateUI();
-
-        GameManager.Instance.RegisterDiscoveredStage(config, currentStage);
-    }
-
     private void HandleCoins()
     {
-        if (GetSatietyPercent() < config.minSatietyForGrowth)
+        if (!HasSatiety())
             return;
 
         coinTimer += Time.deltaTime;
@@ -153,33 +150,55 @@ public class Dino : MonoBehaviour
         if (coinTimer >= 1f)
         {
             coinTimer = 0f;
-            GameManager.Instance.AddCoins(config.coinsPerSecond);
+
+            if (GameManager.Instance != null)
+                GameManager.Instance.AddCoins(config.coinsPerSecond);
         }
     }
 
     public bool Feed(FoodConfig food)
-{
-    if (food == null)
-        return false;
-
-    satiety += food.satietyValue;
-    satiety = Mathf.Clamp(satiety, 0f, config.maxSatiety);
-
-    growthExperience += food.bonusGrowthExperience;
-
-    if (growthExperience >= config.growthExperienceToNextStage)
     {
-        TryGrowToNextStage();
+        if (food == null)
+            return false;
+
+        satiety += food.satietyValue;
+
+        growthExperience += food.bonusGrowthExperience;
+
+        while (growthExperience >= config.growthExperienceToNextStage && !IsFinalStage())
+        {
+            growthExperience -= config.growthExperienceToNextStage;
+            TryGrowToNextStage();
+        }
+
+        if (IsFinalStage())
+            growthExperience = config.growthExperienceToNextStage;
+
+        UpdateUI();
+
+        return true;
     }
 
-    UpdateUI();
+    private void TryGrowToNextStage()
+    {
+        if (IsFinalStage())
+            return;
 
-    return true;
-}
+        currentStage++;
+
+        UpdateVisual();
+        UpdateUI();
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.RegisterDiscoveredStage(config, currentStage);
+    }
 
     public bool CanMergeWith(Dino other)
     {
         if (other == null)
+            return false;
+
+        if (other == this)
             return false;
 
         if (Level != other.Level)
@@ -202,41 +221,81 @@ public class Dino : MonoBehaviour
         if (config.stageSprites == null)
             return false;
 
-        return currentStage >= config.stageSprites.Length;
-    }
+        if (config.stageSprites.Length == 0)
+            return false;
 
-    private float GetSatietyPercent()
-    {
-        return satiety / config.maxSatiety * 100f;
+        return currentStage >= config.stageSprites.Length;
     }
 
     private void UpdateVisual()
     {
+        if (spriteRenderer == null)
+            return;
+
+        if (config == null)
+            return;
+
         if (config.stageSprites == null || config.stageSprites.Length == 0)
             return;
 
         int spriteIndex = Mathf.Clamp(currentStage - 1, 0, config.stageSprites.Length - 1);
-
-        if (spriteRenderer != null)
-            spriteRenderer.sprite = config.stageSprites[spriteIndex];
+        spriteRenderer.sprite = config.stageSprites[spriteIndex];
     }
 
     private void UpdateUI()
     {
-        if (satietySlider != null)
-            satietySlider.value = satiety / config.maxSatiety;
+        UpdateSatietyUI();
+        UpdateGrowthUI();
+        UpdateLevelText();
+    }
 
-        if (growthSlider != null)
+    private void UpdateSatietyUI()
+    {
+        if (satietySlider == null)
+            return;
+
+        bool shouldShowSatietyBar = satiety <= 0f;
+
+        satietySlider.gameObject.SetActive(shouldShowSatietyBar);
+
+        if (shouldShowSatietyBar)
+            satietySlider.value = 0f;
+    }
+
+    private void UpdateGrowthUI()
+    {
+        if (growthSlider == null)
+            return;
+
+        if (config == null)
         {
-            if (IsFinalStage())
-                growthSlider.value = 1f;
-            else
-                growthSlider.value = growthExperience / config.growthExperienceToNextStage;
+            growthSlider.value = 0f;
+            return;
         }
 
-        if (levelText != null)
-            levelText.text = "Lv." + Level + "  St." + currentStage;
+        if (IsFinalStage())
+        {
+            growthSlider.value = 1f;
+            return;
+        }
+
+        if (config.growthExperienceToNextStage <= 0f)
+        {
+            growthSlider.value = 0f;
+            return;
+        }
+
+        growthSlider.value = growthExperience / config.growthExperienceToNextStage;
     }
+
+    private void UpdateLevelText()
+    {
+        if (levelText == null)
+            return;
+
+        levelText.text = "Lv." + Level + "  St." + currentStage;
+    }
+}
 /*
     private void OnMouseDown()
     {
@@ -284,45 +343,3 @@ public class Dino : MonoBehaviour
             GameManager.Instance.MergeDinos(this, target);
         }
     } */
-
-    private Dino FindMergeTarget()
-    {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, 0.6f);
-
-        foreach (Collider2D hit in hits)
-        {
-            Dino other = hit.GetComponent<Dino>();
-
-            if (other == null)
-                continue;
-
-            if (other == this)
-                continue;
-
-            if (CanMergeWith(other))
-                return other;
-        }
-
-        return null;
-    }
-
-    private Vector3 GetPointerWorldPosition()
-    {
-        Vector3 screenPosition;
-
-        if (Input.touchCount > 0)
-            screenPosition = Input.GetTouch(0).position;
-        else
-            screenPosition = Input.mousePosition;
-
-        Vector3 worldPosition = mainCamera.ScreenToWorldPoint(screenPosition);
-        worldPosition.z = 0f;
-
-        return worldPosition;
-    }
-
-    public void SetDragging(bool value)
-    {
-        isDragging = value;
-    }
-}
