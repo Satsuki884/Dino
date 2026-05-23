@@ -1,10 +1,16 @@
 fileFormatVersion: 2
-guid: a9b76c8da6df0dc46ac94b8721179488
+guid: cef5283f08639594c856c64953495549
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -4906693884735968781
-    second: food512_0
+      213: -5441841738291930802
+    second: food_t_2_0
+  - first:
+      213: -2844052679571523229
+    second: food_t_2_1
+  - first:
+      213: 8976082146948995922
+    second: food_t_2_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -51,7 +57,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 512
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -109,11 +115,24 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: food512_0
+      name: food_t_2_0
       rect:
         serializedVersion: 2
         x: 0
@@ -121,15 +140,15 @@ TextureImporter:
         width: 512
         height: 512
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3f92bba98ebe7ebb0800000000000000
-      internalID: -4906693884735968781
+      spriteID: e49173965c1ba74b0800000000000000
+      internalID: -5441841738291930802
       vertices: []
       indices: 
       edges: []
@@ -138,7 +157,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 6d6e5edb953cb2e4d84eb4a0562509d2
     internalID: 0
     vertices: []
     indices: 
@@ -146,9 +165,13 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceOnImport
+        value: True
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":true,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":512.0,"y":512.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      food512_0: -4906693884735968781
+      food_t_2_0: -5441841738291930802
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

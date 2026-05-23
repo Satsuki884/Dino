@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 3ba90948d557b0d4390f649ab82e125e
+guid: c25815b421731094d8d4d7279224028a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -4906693884735968781
-    second: food512_0
+      213: 3945032398801038256
+    second: dino3_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,7 +126,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: food512_0
+      name: dino3_0
       rect:
         serializedVersion: 2
         x: 0
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3f92bba98ebe7ebb0800000000000000
-      internalID: -4906693884735968781
+      spriteID: 0bb61f5a0129fb630800000000000000
+      internalID: 3945032398801038256
       vertices: []
       indices: 
       edges: []
@@ -151,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: b9d645649c4d1284a8106f01f3c36553
+    spriteID: 4303fb1b9fe765d478cdb7027b342e36
     internalID: 0
     vertices: []
     indices: 
@@ -159,9 +159,11 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":512.0,"y":512.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      food512_0: -4906693884735968781
+      dino3_0: 3945032398801038256
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
