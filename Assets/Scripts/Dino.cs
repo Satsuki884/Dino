@@ -45,12 +45,21 @@ public class Dino : MonoBehaviour
         if (config == null)
             return;
 
-        if (!isDragging)
+        if (!isDragging && CanMoveByStage())
             Move();
 
         HandleTick();
 
         UpdateUI();
+    }
+    private bool CanMoveByStage()
+    {
+        DinoStageData stageData = CurrentStageData;
+
+        if (stageData == null)
+            return false;
+
+        return stageData.canMove;
     }
 
     public void Init(DinoConfig newConfig, int startStage)

@@ -57,6 +57,11 @@ public class UIPanelController : MonoBehaviour
 
     private void Update()
     {
+        // Якщо зараз тягнемо їжу, не закриваємо панелі автоматично.
+        // Інакше інвентар може закритися ще до того, як їжу кинуть на дракончика.
+        if (DraggableFoodUI.IsDraggingFood)
+            return;
+
         if (!closeWhenClickOutside)
             return;
 
@@ -141,12 +146,65 @@ public class UIPanelController : MonoBehaviour
         currentOpenPanelRect = null;
     }
 
+    public void CloseFoodPanelOnly()
+    {
+        if (foodInventoryPanel != null)
+            foodInventoryPanel.SetActive(false);
+
+        if (currentOpenPanel == foodInventoryPanel)
+        {
+            currentOpenPanel = null;
+            currentOpenPanelRect = null;
+        }
+    }
+
+    public void CloseShopPanelOnly()
+    {
+        if (shopPanel != null)
+            shopPanel.SetActive(false);
+
+        if (currentOpenPanel == shopPanel)
+        {
+            currentOpenPanel = null;
+            currentOpenPanelRect = null;
+        }
+    }
+
+    public RectTransform GetFoodPanelRect()
+    {
+        return foodInventoryPanelRect;
+    }
+
+    public RectTransform GetShopPanelRect()
+    {
+        return shopPanelRect;
+    }
+
+    public bool IsAnyPanelOpen()
+    {
+        return currentOpenPanel != null;
+    }
+
+    public bool IsFoodPanelOpen()
+    {
+        return currentOpenPanel == foodInventoryPanel;
+    }
+
+    public bool IsShopPanelOpen()
+    {
+        return currentOpenPanel == shopPanel;
+    }
+
     private bool IsClickInsideRect(RectTransform rect, Vector2 screenPosition)
     {
         if (rect == null)
             return false;
 
-        return RectTransformUtility.RectangleContainsScreenPoint(rect, screenPosition, null);
+        return RectTransformUtility.RectangleContainsScreenPoint(
+            rect,
+            screenPosition,
+            null
+        );
     }
 
     private bool IsClickOnButton(Vector2 screenPosition)
@@ -176,7 +234,11 @@ public class UIPanelController : MonoBehaviour
         if (rect == null)
             return false;
 
-        return RectTransformUtility.RectangleContainsScreenPoint(rect, screenPosition, null);
+        return RectTransformUtility.RectangleContainsScreenPoint(
+            rect,
+            screenPosition,
+            null
+        );
     }
 
     private bool WasPointerPressedThisFrame()
@@ -185,7 +247,8 @@ public class UIPanelController : MonoBehaviour
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
             return true;
 
-        if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
+        if (Touchscreen.current != null &&
+            Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
             return true;
 
         return false;
@@ -193,7 +256,8 @@ public class UIPanelController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
             return true;
 
-        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        if (Input.touchCount > 0 &&
+            Input.GetTouch(0).phase == TouchPhase.Began)
             return true;
 
         return false;
