@@ -1578,6 +1578,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e3656d27ed3cda40b9ef1557081e3c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DinoTouchInput
+  dinoLayerMask:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!4 &761663727
 Transform:
   m_ObjectHideFlags: 0

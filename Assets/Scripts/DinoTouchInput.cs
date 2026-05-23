@@ -3,6 +3,9 @@ using UnityEngine.EventSystems;
 
 public class DinoTouchInput : MonoBehaviour
 {
+    [Header("Layers")]
+    public LayerMask dinoLayerMask;
+
     private Camera mainCamera;
 
     private Dino selectedDino;
@@ -85,48 +88,53 @@ public class DinoTouchInput : MonoBehaviour
     private void TrySelectDino(Vector2 screenPosition)
     {
         if (mainCamera == null)
-        {
             mainCamera = Camera.main;
 
-            if (mainCamera == null)
-            {
-                Debug.LogError("Main Camera not found. Check camera tag MainCamera.");
-                return;
-            }
+        if (mainCamera == null)
+        {
+            Debug.LogError("Main Camera not found. Check MainCamera tag.");
+            return;
         }
 
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(screenPosition);
         worldPosition.z = 0f;
 
-        Collider2D hit = Physics2D.OverlapPoint(worldPosition);
+        Collider2D[] hits = Physics2D.OverlapPointAll(worldPosition, dinoLayerMask);
 
-        if (hit == null)
+        if (hits == null || hits.Length == 0)
         {
-            Debug.Log("No collider under pointer.");
+            Debug.Log("No Dino collider under pointer.");
             return;
         }
 
-        Dino dino = hit.GetComponent<Dino>();
-
-        if (dino == null)
+        foreach (Collider2D hit in hits)
         {
-            Debug.Log("Collider found, but no Dino component on object: " + hit.name);
+            Dino dino = hit.GetComponentInParent<Dino>();
+
+            if (dino == null)
+                continue;
+
+            selectedDino = dino;
+            dragOffset = selectedDino.transform.position - worldPosition;
+            isDragging = false;
+
+            selectedDino.SetDragging(true);
+
+            Debug.Log("Selected dino: " + selectedDino.name);
+
             return;
         }
 
-        Debug.Log("Selected dino: " + dino.name);
-
-        selectedDino = dino;
-        dragOffset = selectedDino.transform.position - worldPosition;
-        isDragging = false;
-
-        selectedDino.SetDragging(true);
+        Debug.Log("Dino layer collider found, but Dino component not found.");
     }
 
     private void DragSelected(Vector2 screenPosition)
     {
         if (selectedDino == null)
             return;
+
+        if (mainCamera == null)
+            mainCamera = Camera.main;
 
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(screenPosition);
         worldPosition.z = 0f;
@@ -148,13 +156,7 @@ public class DinoTouchInput : MonoBehaviour
 
         if (isDragging)
         {
-            bool merged = TryMergeSelectedDino();
-
-            if (!merged)
-            {
-                // Нічого не робимо.
-                // Дракончик просто залишається на новому місці.
-            }
+            TryMergeSelectedDino();
         }
 
         selectedDino = null;
@@ -163,11 +165,18 @@ public class DinoTouchInput : MonoBehaviour
 
     private bool TryMergeSelectedDino()
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(selectedDino.transform.position, 0.6f);
+        if (selectedDino == null)
+            return false;
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(
+            selectedDino.transform.position,
+            0.6f,
+            dinoLayerMask
+        );
 
         foreach (Collider2D hit in hits)
         {
-            Dino other = hit.GetComponent<Dino>();
+            Dino other = hit.GetComponentInParent<Dino>();
 
             if (other == null)
                 continue;
