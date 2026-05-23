@@ -1,16 +1,16 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-
-#if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
-#endif
 
-public class DinoTouchInput : MonoBehaviour
+public class DinoTouchInputNew : MonoBehaviour
 {
-
     [Header("UI Blocking")]
-    public bool blockInputOverUI = true; 
+    public bool blockInputOverUI = true;
+
+    [Header("Drag Settings")]
+    public float dragDistance = 5f;
+    public float mergeRadius = 0.6f;
 
     private Camera mainCamera;
 
@@ -20,11 +20,10 @@ public class DinoTouchInput : MonoBehaviour
     private bool isDragging;
     private Vector2 pointerStartPosition;
 
-    private const float dragDistance = 5f;
-
     private void Awake()
     {
-        mainCamera = Camera.main;}
+        mainCamera = Camera.main;
+    }
 
     private void Update()
     {
@@ -38,7 +37,7 @@ public class DinoTouchInput : MonoBehaviour
         bool releasedThisFrame = false;
         Vector2 screenPosition = Vector2.zero;
 
-#if ENABLE_INPUT_SYSTEM
+        // Миша для ПК
         if (Mouse.current != null)
         {
             pressedThisFrame = Mouse.current.leftButton.wasPressedThisFrame;
@@ -47,38 +46,26 @@ public class DinoTouchInput : MonoBehaviour
             screenPosition = Mouse.current.position.ReadValue();
         }
 
-        if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed)
+        // Палець для телефона
+        if (Touchscreen.current != null)
         {
             TouchControl touch = Touchscreen.current.primaryTouch;
 
-            pressedThisFrame = touch.press.wasPressedThisFrame;
-            isPressed = touch.press.isPressed;
-            releasedThisFrame = touch.press.wasReleasedThisFrame;
-            screenPosition = touch.position.ReadValue();
+            if (touch.press.wasPressedThisFrame ||
+                touch.press.isPressed ||
+                touch.press.wasReleasedThisFrame)
+            {
+                pressedThisFrame = touch.press.wasPressedThisFrame;
+                isPressed = touch.press.isPressed;
+                releasedThisFrame = touch.press.wasReleasedThisFrame;
+                screenPosition = touch.position.ReadValue();
+            }
         }
-#else
-        pressedThisFrame = Input.GetMouseButtonDown(0);
-        isPressed = Input.GetMouseButton(0);
-        releasedThisFrame = Input.GetMouseButtonUp(0);
-        screenPosition = Input.mousePosition;
-
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
-
-            pressedThisFrame = touch.phase == TouchPhase.Began;
-            isPressed = touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary;
-            releasedThisFrame = touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled;
-            screenPosition = touch.position;
-        }
-#endif
 
         if (pressedThisFrame)
         {
             if (blockInputOverUI && IsPointerOverUI())
-            {
                 return;
-            }
 
             pointerStartPosition = screenPosition;
             TrySelectDino(screenPosition);
@@ -104,37 +91,44 @@ public class DinoTouchInput : MonoBehaviour
     private void TrySelectDino(Vector2 screenPosition)
     {
         if (mainCamera == null)
-        {
             mainCamera = Camera.main;
 
-            if (mainCamera == null)
-            {
-                return;
-            }
+        if (mainCamera == null)
+        {
+            Debug.LogError("Main Camera not found. Check MainCamera tag.");
+            return;
         }
 
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(screenPosition);
         worldPosition.z = 0f;
 
-        Collider2D hit = Physics2D.OverlapPoint(worldPosition);
+        /*
+         Важливо:
+         Використовуємо OverlapPointAll, а не OverlapPoint.
+         Так ми не ламаємось, якщо першим знайдеться Field.
+         Ми просто перебираємо всі колайдери під курсором і беремо той,
+         у якого є Dino в батьківських об'єктах.
+        */
+        Collider2D[] hits = Physics2D.OverlapPointAll(worldPosition);
 
-        if (hit == null)
+        if (hits == null || hits.Length == 0)
+            return;
+
+        foreach (Collider2D hit in hits)
         {
+            Dino dino = hit.GetComponentInParent<Dino>();
+
+            if (dino == null)
+                continue;
+
+            selectedDino = dino;
+            dragOffset = selectedDino.transform.position - worldPosition;
+            isDragging = false;
+
+            selectedDino.SetDragging(true);
+
             return;
         }
-
-        Dino dino = hit.GetComponentInParent<Dino>();
-
-        if (dino == null)
-        {
-            return;
-        }
-
-        selectedDino = dino;
-        dragOffset = selectedDino.transform.position - worldPosition;
-        isDragging = false;
-
-        selectedDino.SetDragging(true);
     }
 
     private void DragSelected(Vector2 screenPosition)
@@ -144,6 +138,9 @@ public class DinoTouchInput : MonoBehaviour
 
         if (mainCamera == null)
             mainCamera = Camera.main;
+
+        if (mainCamera == null)
+            return;
 
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(screenPosition);
         worldPosition.z = 0f;
@@ -175,7 +172,10 @@ public class DinoTouchInput : MonoBehaviour
         if (selectedDino == null)
             return false;
 
-        Collider2D[] hits = Physics2D.OverlapCircleAll(selectedDino.transform.position, 0.6f);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(
+            selectedDino.transform.position,
+            mergeRadius
+        );
 
         foreach (Collider2D hit in hits)
         {
