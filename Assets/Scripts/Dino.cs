@@ -516,4 +516,32 @@ public class Dino : MonoBehaviour
 
         return stageData.sprite;
     }
+
+    public bool CanGoToRaid()
+    {
+        if (isInRaid)
+            return false;
+
+        // Динозавр 1 стадии не может идти в рейд
+        if (Stage <= 1)
+            return false;
+
+        return true;
+    }
+
+    public float GetRaidReward()
+    {
+        if (config == null)
+            return 0f;
+
+        return config.coinPerRaid;
+    }
+
+    public float GetRaidDuration()
+    {
+        if (config == null)
+            return 10f;
+
+        return Mathf.Max(1f, config.timeToRaid);
+    }
 }
