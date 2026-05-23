@@ -84,18 +84,37 @@ public class DinoTouchInput : MonoBehaviour
 
     private void TrySelectDino(Vector2 screenPosition)
     {
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+
+            if (mainCamera == null)
+            {
+                Debug.LogError("Main Camera not found. Check camera tag MainCamera.");
+                return;
+            }
+        }
+
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(screenPosition);
         worldPosition.z = 0f;
 
         Collider2D hit = Physics2D.OverlapPoint(worldPosition);
 
         if (hit == null)
+        {
+            Debug.Log("No collider under pointer.");
             return;
+        }
 
         Dino dino = hit.GetComponent<Dino>();
 
         if (dino == null)
+        {
+            Debug.Log("Collider found, but no Dino component on object: " + hit.name);
             return;
+        }
+
+        Debug.Log("Selected dino: " + dino.name);
 
         selectedDino = dino;
         dragOffset = selectedDino.transform.position - worldPosition;
