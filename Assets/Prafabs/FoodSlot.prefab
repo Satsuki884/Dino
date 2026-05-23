@@ -332,8 +332,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -530,6 +530,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3028687002036458680}
   - component: {fileID: 418400571528849789}
+  - component: {fileID: 4263550341572655997}
   m_Layer: 5
   m_Name: FoodSlot
   m_TagString: Untagged
@@ -555,10 +556,10 @@ RectTransform:
   - {fileID: 2615846956999481488}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &418400571528849789
 MonoBehaviour:
@@ -577,3 +578,11 @@ MonoBehaviour:
   priceText: {fileID: 3340248993276946651}
   buyButton: {fileID: 8252214642857447803}
   draggableFood: {fileID: 8165959596625513077}
+--- !u!222 &4263550341572655997
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8200215348432000218}
+  m_CullTransparentMesh: 1

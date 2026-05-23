@@ -19,7 +19,7 @@ MonoBehaviour:
   moveSpeed: 1.2
   stages:
   - stageName: Stage 1
-    sprite: {fileID: -974494812864979246, guid: 675d8366b95a4f146adfc24a6df8ea76, type: 3}
+    sprite: {fileID: -7033090210418254279, guid: 9a1e0c98d892ea945abf7981f2d56972, type: 3}
     ticksToNextStage: 5
     caloriesConsumePerTick: 6
     coinsPerTick: 0.1
