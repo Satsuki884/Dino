@@ -34,6 +34,9 @@ public class RaidManager : MonoBehaviour
         if (dino.IsInRaid())
             return false;
 
+        if (IsAlreadyInRaid(dino))
+            return false;
+
         RaidEntry entry = new RaidEntry();
         entry.dino = dino;
         entry.returnPosition = returnPosition;
@@ -114,7 +117,18 @@ public class RaidManager : MonoBehaviour
         if (dino == null)
             return 0;
 
-        return dino.Level * rewardPerDinoLevel;
+        return Mathf.Max(1, dino.Level) * rewardPerDinoLevel;
+    }
+
+    private bool IsAlreadyInRaid(Dino dino)
+    {
+        foreach (RaidEntry entry in activeRaids)
+        {
+            if (entry.dino == dino)
+                return true;
+        }
+
+        return false;
     }
 }
 
