@@ -553,4 +553,32 @@ public class Dino : MonoBehaviour
         UpdateVisual();
         UpdateUI();
     }
+
+    public bool CanGoToRaid()
+    {
+        if (isInRaid)
+            return false;
+
+        if (Stage <= 1)
+            return false;
+
+        return true;
+    }
+
+    public float GetRaidReward()
+    {
+        if (config == null)
+            return 0f;
+
+        return config.coinPerRaid;
+    }
+
+    public float GetRaidDuration()
+    {
+        if (config == null)
+            return 10f;
+
+        return Mathf.Max(1f, config.timeToRaid);
+    }
+
 }
