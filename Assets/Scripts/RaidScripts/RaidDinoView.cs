@@ -74,7 +74,7 @@ public class RaidDinoView : MonoBehaviour
         {
             timerSlider.minValue = 0f;
             timerSlider.maxValue = 1f;
-            timerSlider.value = Mathf.Clamp01(entry.timeLeft / RaidManager.Instance.raidDuration);
+            timerSlider.value = Mathf.Clamp01(entry.timeLeft / entry.raidDuration);
         }
     }
 

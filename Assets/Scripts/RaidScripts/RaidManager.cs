@@ -6,10 +6,6 @@ public class RaidManager : MonoBehaviour
 {
     public static RaidManager Instance;
 
-    [Header("Raid Settings")]
-    public float raidDuration = 300f; // 5 minutes
-    public int rewardPerDinoLevel = 100;
-
     private readonly List<RaidEntry> activeRaids = new List<RaidEntry>();
 
     public IReadOnlyList<RaidEntry> ActiveRaids => activeRaids;
@@ -31,8 +27,11 @@ public class RaidManager : MonoBehaviour
         if (dino == null)
             return false;
 
-        if (dino.IsInRaid())
+        if (!dino.CanGoToRaid())
+        {
+            Debug.Log("This dino cannot go to raid.");
             return false;
+        }
 
         if (IsAlreadyInRaid(dino))
             return false;
@@ -40,8 +39,9 @@ public class RaidManager : MonoBehaviour
         RaidEntry entry = new RaidEntry();
         entry.dino = dino;
         entry.returnPosition = returnPosition;
-        entry.timeLeft = raidDuration;
-        entry.rewardCoins = CalculateReward(dino);
+        entry.raidDuration = dino.GetRaidDuration();
+        entry.timeLeft = entry.raidDuration;
+        entry.rewardCoins = dino.GetRaidReward();
 
         activeRaids.Add(entry);
 
@@ -112,14 +112,6 @@ public class RaidManager : MonoBehaviour
         OnRaidsChanged?.Invoke();
     }
 
-    private int CalculateReward(Dino dino)
-    {
-        if (dino == null)
-            return 0;
-
-        return Mathf.Max(1, dino.Level) * rewardPerDinoLevel;
-    }
-
     private bool IsAlreadyInRaid(Dino dino)
     {
         foreach (RaidEntry entry in activeRaids)
@@ -137,6 +129,8 @@ public class RaidEntry
 {
     public Dino dino;
     public Vector3 returnPosition;
+
+    public float raidDuration;
     public float timeLeft;
-    public int rewardCoins;
+    public float rewardCoins;
 }
