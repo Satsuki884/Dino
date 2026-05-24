@@ -4,6 +4,8 @@ using TMPro;
 
 public class Dino : MonoBehaviour
 {
+    private const int WorldCanvasSortingOrder = 100;
+
     [Header("Visual")]
     public SpriteRenderer spriteRenderer;
     [Tooltip("Enable this if the sprite art faces left when Flip X is off.")]
@@ -42,6 +44,7 @@ public class Dino : MonoBehaviour
     private Quaternion spriteStartRotation;
     private GameObject hungerStatusInstance;
     private GameObject raidReadyStatusInstance;
+    private Canvas worldCanvas;
 
     public int Level => config != null ? config.level : 0;
     public int Stage => currentStage;
@@ -498,6 +501,7 @@ public class Dino : MonoBehaviour
     private void UpdateStatusIcons()
     {
         EnsureStatusIcons();
+        EnsureWorldCanvasSorting();
 
         if (hungerStatusInstance != null)
             hungerStatusInstance.SetActive(!HasCalories());
@@ -516,6 +520,18 @@ public class Dino : MonoBehaviour
 
         if (raidReadyStatusInstance == null && raidReadyStatusPrefab != null)
             raidReadyStatusInstance = Instantiate(raidReadyStatusPrefab, statusParent);
+    }
+
+    private void EnsureWorldCanvasSorting()
+    {
+        if (worldCanvas == null && statusParent != null)
+            worldCanvas = statusParent.GetComponentInParent<Canvas>();
+
+        if (worldCanvas == null)
+            return;
+
+        worldCanvas.overrideSorting = true;
+        worldCanvas.sortingOrder = WorldCanvasSortingOrder;
     }
 
     private void UpdateGrowthUI()
