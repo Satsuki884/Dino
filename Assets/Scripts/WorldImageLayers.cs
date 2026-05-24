@@ -35,6 +35,13 @@ public class WorldImageLayers : MonoBehaviour
         zOffset = 2f
     };
 
+    public ImageLayer smoke = new ImageLayer
+    {
+        sortingOrder = 5,
+        alpha = 1f,
+        zOffset = 3f
+    };
+
     public ImageLayer shadow = new ImageLayer
     {
         sortingOrder = 15,
@@ -54,6 +61,7 @@ public class WorldImageLayers : MonoBehaviour
 
         EnsureLayer(ref background, "Background");
         EnsureLayer(ref foreground, "Foreground");
+        EnsureLayer(ref smoke, "Smoke");
         EnsureLayer(ref shadow, "Shadow");
         ApplyLayers();
     }
@@ -82,6 +90,7 @@ public class WorldImageLayers : MonoBehaviour
         float matchedScale = GetMatchedScale();
 
         ApplyLayer(background, matchedScale);
+        ApplyLayer(smoke, matchedScale);
         ApplyLayer(foreground, matchedScale);
         ApplyLayer(shadow, matchedScale);
         UpdateWorldShadowProjection();
