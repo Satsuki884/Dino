@@ -17,10 +17,11 @@ public class Dino : MonoBehaviour
     [Range(0f, 1f)] public float hungryWalkTiltSpeedMultiplier = 0.25f;
 
     [Header("UI Above Head")]
-    public Slider caloriesSlider;
     public Slider growthSlider;
     public TMP_Text levelText;
-    public GameObject raidReadyIcon;
+    public Transform statusParent;
+    public GameObject hungerStatusPrefab;
+    public GameObject raidReadyStatusPrefab;
 
     [Header("Runtime Info")]
     [SerializeField] private DinoConfig config;
@@ -39,6 +40,8 @@ public class Dino : MonoBehaviour
     private float tickTimer;
     private bool isInRaid;
     private Quaternion spriteStartRotation;
+    private GameObject hungerStatusInstance;
+    private GameObject raidReadyStatusInstance;
 
     public int Level => config != null ? config.level : 0;
     public int Stage => currentStage;
@@ -487,23 +490,32 @@ public class Dino : MonoBehaviour
 
     private void UpdateUI()
     {
-        UpdateCaloriesUI();
         UpdateGrowthUI();
         UpdateLevelText();
-        UpdateRaidReadyIcon();
+        UpdateStatusIcons();
     }
 
-    private void UpdateCaloriesUI()
+    private void UpdateStatusIcons()
     {
-        if (caloriesSlider == null)
+        EnsureStatusIcons();
+
+        if (hungerStatusInstance != null)
+            hungerStatusInstance.SetActive(!HasCalories());
+
+        if (raidReadyStatusInstance != null)
+            raidReadyStatusInstance.SetActive(CanGoToRaid());
+    }
+
+    private void EnsureStatusIcons()
+    {
+        if (statusParent == null)
             return;
 
-        bool shouldShowCaloriesBar = calories <= 0f;
+        if (hungerStatusInstance == null && hungerStatusPrefab != null)
+            hungerStatusInstance = Instantiate(hungerStatusPrefab, statusParent);
 
-        caloriesSlider.gameObject.SetActive(shouldShowCaloriesBar);
-
-        if (shouldShowCaloriesBar)
-            caloriesSlider.value = 0f;
+        if (raidReadyStatusInstance == null && raidReadyStatusPrefab != null)
+            raidReadyStatusInstance = Instantiate(raidReadyStatusPrefab, statusParent);
     }
 
     private void UpdateGrowthUI()
@@ -692,14 +704,6 @@ public class Dino : MonoBehaviour
 
         UpdateVisual();
         UpdateUI();
-    }
-
-    private void UpdateRaidReadyIcon()
-    {
-        if (raidReadyIcon == null)
-            return;
-
-        raidReadyIcon.SetActive(CanGoToRaid());
     }
 
 }
