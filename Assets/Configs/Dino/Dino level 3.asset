@@ -13,34 +13,35 @@ MonoBehaviour:
   m_Name: Dino level 3
   m_EditorClassIdentifier: Assembly-CSharp::DinoConfig
   level: 3
-  dinoName: 'Dino level 3 '
-  buyPrice: 55
-  startCalories: 784
+  dinoName: 'Senkosaurus '
+  buyPrice: 720
+  startCalories: 448
   moveSpeed: 1.4
   growthTimeMultiplier: 2
-  coinPerRaid: 1
-  timeToRaid: 10
+  coinPerRaid: 288
+  timeToRaid: 36
+  minCaloriesForRaid: 1440
   stages:
-  - stageName: Stage 1
+  - stageName: Egg
     sprite: {fileID: -7475038807813967987, guid: 521ab6285994db549b1cb95dc47d6a37, type: 3}
     ticksToNextStage: 14
-    caloriesConsumePerTick: 16
+    caloriesConsumePerTick: 32
     coinsPerTick: 0.5
     canMove: 0
     spawnedCoinIntervalMin: 5
     spawnedCoinIntervalMax: 10
-  - stageName: Stage 2
+  - stageName: Baby
     sprite: {fileID: -3177358475750843838, guid: e34e1c84840977a42b24b67c93fb3b9a, type: 3}
     ticksToNextStage: 40
-    caloriesConsumePerTick: 14
+    caloriesConsumePerTick: 28
     coinsPerTick: 5
     canMove: 1
     spawnedCoinIntervalMin: 5
     spawnedCoinIntervalMax: 10
-  - stageName: Stage 3
+  - stageName: Dino
     sprite: {fileID: 1451478870644479156, guid: 5195c0e281f7f874ab24d1648a2a4d10, type: 3}
     ticksToNextStage: 0
-    caloriesConsumePerTick: 10
+    caloriesConsumePerTick: 22
     coinsPerTick: 15
     canMove: 1
     spawnedCoinIntervalMin: 5
