@@ -14,9 +14,14 @@ public class RaidDropZone : MonoBehaviour
         if (dino == null)
             return false;
 
+        return ContainsPoint(dino.transform.position);
+    }
+
+    public bool ContainsPoint(Vector3 point)
+    {
         if (zoneCollider == null)
             return false;
 
-        return zoneCollider.OverlapPoint(dino.transform.position);
+        return zoneCollider.OverlapPoint(point);
     }
 }

@@ -251,12 +251,29 @@ public class DinoTouchInput : MonoBehaviour
         if (GameManager.Instance == null)
             return position;
 
+        if (CanDragToRaidZone(position))
+            return position;
+
         Bounds bounds = GameManager.Instance.GetFieldBounds();
 
         position.x = Mathf.Clamp(position.x, bounds.min.x, bounds.max.x);
         position.y = Mathf.Clamp(position.y, bounds.min.y, bounds.max.y);
 
         return position;
+    }
+
+    private bool CanDragToRaidZone(Vector3 position)
+    {
+        if (selectedDino == null)
+            return false;
+
+        if (!selectedDino.CanGoToRaid())
+            return false;
+
+        if (raidDropZone == null)
+            return false;
+
+        return raidDropZone.ContainsPoint(position);
     }
 
     private bool IsPointerOverUI()

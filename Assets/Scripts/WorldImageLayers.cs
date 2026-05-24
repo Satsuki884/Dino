@@ -42,6 +42,13 @@ public class WorldImageLayers : MonoBehaviour
         zOffset = 3f
     };
 
+    public ImageLayer raid = new ImageLayer
+    {
+        sortingOrder = 10,
+        alpha = 1f,
+        zOffset = 2.5f
+    };
+
     public ImageLayer shadow = new ImageLayer
     {
         sortingOrder = 15,
@@ -62,6 +69,7 @@ public class WorldImageLayers : MonoBehaviour
         EnsureLayer(ref background, "Background");
         EnsureLayer(ref foreground, "Foreground");
         EnsureLayer(ref smoke, "Smoke");
+        EnsureLayer(ref raid, "Raid");
         EnsureLayer(ref shadow, "Shadow");
         ApplyLayers();
     }
@@ -91,6 +99,7 @@ public class WorldImageLayers : MonoBehaviour
 
         ApplyLayer(background, matchedScale);
         ApplyLayer(smoke, matchedScale);
+        ApplyLayer(raid, matchedScale);
         ApplyLayer(foreground, matchedScale);
         ApplyLayer(shadow, matchedScale);
         UpdateWorldShadowProjection();
