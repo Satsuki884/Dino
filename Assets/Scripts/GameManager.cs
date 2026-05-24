@@ -192,6 +192,13 @@ public class GameManager : MonoBehaviour
             return;
 
         int newLevel = first.Level + 1;
+
+        if (!HasConfigForLevel(newLevel))
+        {
+            Debug.Log("Cannot merge dinos: no DinoConfig for level " + newLevel + ".");
+            return;
+        }
+
         Vector3 spawnPosition = (first.transform.position + second.transform.position) / 2f;
 
         RemoveDino(first);

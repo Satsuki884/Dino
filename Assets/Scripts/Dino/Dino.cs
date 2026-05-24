@@ -348,6 +348,9 @@ public class Dino : MonoBehaviour
         if (!other.IsFinalStage())
             return false;
 
+        if (IsMaxDino() || other.IsMaxDino())
+            return false;
+
         return true;
     }
 
