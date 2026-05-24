@@ -22,6 +22,9 @@ public class FoodButton : MonoBehaviour
 
     private void BuyFood()
     {
+        if (AudioManager.Instanse != null)
+            AudioManager.Instanse.PlayClick();
+
         if (foodConfig == null)
         {
             Debug.LogWarning("FoodConfig is not assigned in FoodButton.");
