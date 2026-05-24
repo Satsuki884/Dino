@@ -5151,6 +5151,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e793a52f28a1e8448954cde43a1d7fdc, type: 2}
   - {fileID: 11400000, guid: 2ea59dbe9bec9854c9b9c781acc9b015, type: 2}
   - {fileID: 11400000, guid: b943b90d42cecdc47bfb983dcc5edda4, type: 2}
+  - {fileID: 11400000, guid: 2786fb06b71fdd44195eb9c0d31d6c5e, type: 2}
+  - {fileID: 11400000, guid: b4a585fbae3809b48b0a41a1f34d2110, type: 2}
   fieldBounds: {fileID: 1296302593}
   coinsText: {fileID: 2106407413}
   dinoLimitText: {fileID: 1564230646}
