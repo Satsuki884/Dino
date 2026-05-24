@@ -13,6 +13,8 @@ public class GameSaveData
     public List<DinoSaveData> dinos = new List<DinoSaveData>();
     public List<FoodSaveData> foods = new List<FoodSaveData>();
     public List<DinoEggPriceSaveData> dinoEggPrices = new List<DinoEggPriceSaveData>();
+
+    public int selectedFoodBuyAmount = 1;
 }
 
 [Serializable]

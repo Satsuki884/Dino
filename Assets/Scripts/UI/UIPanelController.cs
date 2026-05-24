@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using UnityEngine.EventSystems;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -36,6 +38,7 @@ public class UIPanelController : MonoBehaviour
 
     private bool ignoreNextOutsideClick;
     private bool foodPanelHiddenDuringDrag;
+    private readonly List<RaycastResult> uiRaycastResults = new List<RaycastResult>();
 
     private void Awake()
     {
@@ -290,6 +293,9 @@ public class UIPanelController : MonoBehaviour
 
     private bool IsClickOnButton(Vector2 screenPosition)
     {
+        if (IsClickOnAnyUIButton(screenPosition))
+            return true;
+
         if (IsClickInsideButton(shopButton, screenPosition))
             return true;
 
@@ -301,6 +307,29 @@ public class UIPanelController : MonoBehaviour
 
         if (IsClickInsideButton(foodCloseButton, screenPosition))
             return true;
+
+        return false;
+    }
+
+    private bool IsClickOnAnyUIButton(Vector2 screenPosition)
+    {
+        if (EventSystem.current == null)
+            return false;
+
+        PointerEventData pointerData = new PointerEventData(EventSystem.current);
+        pointerData.position = screenPosition;
+
+        uiRaycastResults.Clear();
+        EventSystem.current.RaycastAll(pointerData, uiRaycastResults);
+
+        foreach (RaycastResult result in uiRaycastResults)
+        {
+            if (result.gameObject == null)
+                continue;
+
+            if (result.gameObject.GetComponentInParent<Button>() != null)
+                return true;
+        }
 
         return false;
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,8 +13,15 @@ public class FoodInventory : MonoBehaviour
     [Header("Available Food")]
     public List<FoodConfig> availableFoods = new List<FoodConfig>();
 
+    [Header("Buying")]
+    [SerializeField] private int selectedBuyAmount = 1;
+
     private readonly Dictionary<FoodConfig, int> foodAmounts = new Dictionary<FoodConfig, int>();
     private readonly List<FoodSlotUI> spawnedSlots = new List<FoodSlotUI>();
+
+    public int SelectedBuyAmount => Mathf.Max(1, selectedBuyAmount);
+
+    public event Action<int> SelectedBuyAmountChanged;
 
     private void Awake()
     {
@@ -79,16 +87,33 @@ public class FoodInventory : MonoBehaviour
 
     public void BuyFood(FoodConfig food)
     {
+        BuyFood(food, SelectedBuyAmount);
+    }
+
+    public void BuyFood(FoodConfig food, int amount)
+    {
         if (food == null)
+            return;
+
+        if (amount <= 0)
             return;
 
         if (GameManager.Instance == null)
             return;
 
-        if (!GameManager.Instance.SpendCoins(food.price))
+        int totalPrice = food.price * amount;
+
+        if (!GameManager.Instance.SpendCoins(totalPrice))
             return;
 
-        AddFood(food, 1);
+        AddFood(food, amount);
+    }
+
+    public void SetSelectedBuyAmount(int amount)
+    {
+        selectedBuyAmount = Mathf.Max(1, amount);
+        RefreshInventoryUI();
+        SelectedBuyAmountChanged?.Invoke(SelectedBuyAmount);
     }
 
     private void BuildInventoryUI()
