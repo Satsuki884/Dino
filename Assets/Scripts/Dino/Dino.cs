@@ -270,6 +270,9 @@ public class Dino : MonoBehaviour
         if (food == null)
             return false;
 
+        if (food.satietyValue <= 0f)
+            return false;
+
         calories += food.satietyValue;
 
         if (food.bonusGrowthExperience > 0f && !IsFinalStage())

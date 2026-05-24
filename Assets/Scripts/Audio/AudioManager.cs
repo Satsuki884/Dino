@@ -23,6 +23,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip deploy_item;
     public AudioClip pick_up_coin;
     public AudioClip marge;
+    public AudioClip feed_dino;
 
     // ================= MUSIC =================
 
@@ -57,12 +58,22 @@ public class AudioManager : MonoBehaviour
 
     public void SetMusicVolume(float value)
     {
-        audioMixer.SetFloat("MusicVolume", Mathf.Log10(Mathf.Clamp(value, 0.0001f, 1f)) * 20f);
+        if (audioMixer == null) return;
+
+        audioMixer.SetFloat("MusicVolume", GetVolumeDb(value));
     }
 
     public void SetSFXVolume(float value)
     {
-        audioMixer.SetFloat("SFXVolume", Mathf.Log10(Mathf.Clamp(value, 0.0001f, 1f)) * 20f);
+        if (audioMixer == null) return;
+
+        audioMixer.SetFloat("SFXVolume", GetVolumeDb(value));
+    }
+
+    private float GetVolumeDb(float value)
+    {
+        float normalizedValue = Mathf.Clamp(value, 0f, 100f) / 100f;
+        return Mathf.Log10(Mathf.Clamp(normalizedValue, 0.0001f, 1f)) * 20f;
     }
 
     // ================= SFX =================
@@ -85,9 +96,24 @@ public class AudioManager : MonoBehaviour
         PlaySFX(deploy_item);
     }
 
+    public void PlayDropCoin()
+    {
+        PlaySFX(drop_coin);
+    }
+
+    public void PlayPickUpCoin()
+    {
+        PlaySFX(pick_up_coin);
+    }
+
     public void PlayMerge()
     {
         PlaySFX(marge);
+    }
+
+    public void PlayFeedDino()
+    {
+        PlaySFX(feed_dino);
     }
 
 }

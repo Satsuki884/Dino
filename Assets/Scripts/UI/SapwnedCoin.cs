@@ -28,7 +28,10 @@ public class SpawnedCoin : MonoBehaviour
         lifeTime = newLifeTime;
 
         if (valueText != null)
-            valueText.text = CoinFormatter.FormatNumber(value);
+            valueText.text = FormatNumber(value);
+
+        if (AudioManager.Instanse != null)
+            AudioManager.Instanse.PlayDropCoin();
 
         Destroy(gameObject, lifeTime);
     }
@@ -114,7 +117,34 @@ public class SpawnedCoin : MonoBehaviour
         if (GameManager.Instance != null)
             GameManager.Instance.AddCoins(value);
 
+        if (AudioManager.Instanse != null)
+            AudioManager.Instanse.PlayPickUpCoin();
+
         Destroy(gameObject);
     }
 
+    private string FormatNumber(float number)
+    {
+        if (number < 1000)
+            return Mathf.FloorToInt(number).ToString();
+
+        if (number < 1000000)
+            return FormatShort(number / 1000f) + "K";
+
+        if (number < 1000000000)
+            return FormatShort(number / 1000000f) + "M";
+
+        return FormatShort(number / 1000000000f) + "B";
+    }
+
+    private string FormatShort(float value)
+    {
+        if (value >= 100)
+            return Mathf.FloorToInt(value).ToString();
+
+        if (value >= 10)
+            return value.ToString("0.#");
+
+        return value.ToString("0.##");
+    }
 }
