@@ -647,7 +647,7 @@ public class Dino : MonoBehaviour
         if (isInRaid)
             return false;
 
-        if (Stage <= 1)
+        if (Stage <= 2)
             return false;
 
         if (config == null)

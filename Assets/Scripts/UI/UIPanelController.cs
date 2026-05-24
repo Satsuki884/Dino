@@ -1,7 +1,9 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
+using UnityEngine.SceneManagement;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -11,24 +13,25 @@ public class UIPanelController : MonoBehaviour
 {
     public static UIPanelController Instance;
 
-    [Header("Panels")]
-    public GameObject shopPanel;
+    [Header("Dino Shop")]
+    [FormerlySerializedAs("shopPanel")] public GameObject dinoShopPanel;
+    [FormerlySerializedAs("shopPanelRect")] public RectTransform dinoShopPanelRect;
+    [FormerlySerializedAs("shopButton")] public Button dinoShopButton;
+    [FormerlySerializedAs("shopCloseButton")] public Button dinoShopCloseButton;
+
+    [Header("Food Shop")]
+    public GameObject foodShopPanel;
+    public RectTransform foodShopPanelRect;
+    [FormerlySerializedAs("foodButton")] public Button foodShopButton;
+    [FormerlySerializedAs("foodCloseButton")] public Button foodShopCloseButton;
+
+    [Header("Food Inventory")]
     public GameObject foodInventoryPanel;
-
-    [Header("Panel Rects")]
-    public RectTransform shopPanelRect;
     public RectTransform foodInventoryPanelRect;
-
-    [Header("Canvas Groups")]
     public CanvasGroup foodInventoryCanvasGroup;
 
-    [Header("Open Buttons")]
-    public Button shopButton;
-    public Button foodButton;
-
-    [Header("Close Buttons")]
-    public Button shopCloseButton;
-    public Button foodCloseButton;
+    [Header("Close Settings")]
+    public bool closeWhenClickOutside = true;
 
     [Header("Mini Menu")]
     public GameObject miniMenuPanel;
@@ -38,19 +41,18 @@ public class UIPanelController : MonoBehaviour
     public Slider musicVolumeSlider;
     public Slider sfxVolumeSlider;
 
-    [Header("Close Settings")]
-    public bool closeWhenClickOutside = true;
-
     private GameObject currentOpenPanel;
     private RectTransform currentOpenPanelRect;
 
-    private bool ignoreNextOutsideClick;
     private bool foodPanelHiddenDuringDrag;
     private GameObject miniMenuInputBlocker;
     private CanvasGroup miniMenuCanvasGroup;
     private Canvas miniMenuCanvas;
     private bool originalMiniMenuCanvasOverrideSorting;
     private int originalMiniMenuCanvasSortingOrder;
+
+    private bool ignoreNextOutsideClick;
+    private readonly List<RaycastResult> uiRaycastResults = new List<RaycastResult>();
 
     private void Awake()
     {
@@ -62,30 +64,30 @@ public class UIPanelController : MonoBehaviour
         if (foodInventoryCanvasGroup == null && foodInventoryPanel != null)
             foodInventoryCanvasGroup = foodInventoryPanel.GetComponent<CanvasGroup>();
 
-        FindMiniMenuReferences();
-        ConfigureMiniMenu();
+        if (dinoShopButton != null)
+            dinoShopButton.onClick.AddListener(OnDinoShopButtonClicked);
 
-        if (shopButton != null)
-            shopButton.onClick.AddListener(OnShopButtonClicked);
+        if (foodShopButton != null)
+            foodShopButton.onClick.AddListener(OnFoodShopButtonClicked);
 
-        if (foodButton != null)
-            foodButton.onClick.AddListener(OnFoodButtonClicked);
+        if (dinoShopCloseButton != null)
+            dinoShopCloseButton.onClick.AddListener(OnCloseButtonClicked);
 
-        if (shopCloseButton != null)
-            shopCloseButton.onClick.AddListener(OnCloseButtonClicked);
+        if (foodShopCloseButton != null)
+            foodShopCloseButton.onClick.AddListener(OnCloseButtonClicked);
 
-        if (foodCloseButton != null)
-            foodCloseButton.onClick.AddListener(OnCloseButtonClicked);
+        if (foodShopPanel == null)
+            Debug.LogWarning("FoodShopPanel is not assigned in UIPanelController. Assign the food shop panel separately from FoodInventoryPanel.");
+
+        if (foodInventoryPanel == null)
+            Debug.LogWarning("FoodInventoryPanel is not assigned in UIPanelController. Food inventory should stay visible.");
 
         CloseAllPanels();
-        CloseMiniMenu();
+        ShowFoodInventoryPanel();
     }
 
     private void Update()
     {
-        if (HandleMiniMenuButtonFallback())
-            return;
-
         if (DraggableFoodUI.IsDraggingFood)
             return;
 
@@ -115,47 +117,22 @@ public class UIPanelController : MonoBehaviour
         CloseAllPanels();
     }
 
-    private void OnShopButtonClicked()
+    private void OnDinoShopButtonClicked()
     {
         PlayClick();
-        HandlePanelButtonClick(shopPanel, shopPanelRect);
+        HandlePanelButtonClick(dinoShopPanel, dinoShopPanelRect);
     }
 
-    private void OnFoodButtonClicked()
+    private void OnFoodShopButtonClicked()
     {
         PlayClick();
-        HandlePanelButtonClick(foodInventoryPanel, foodInventoryPanelRect);
+        HandlePanelButtonClick(foodShopPanel, foodShopPanelRect);
     }
 
     private void OnCloseButtonClicked()
     {
         PlayClick();
         CloseAllPanels();
-    }
-
-    private void OnMiniMenuButtonClicked()
-    {
-        if (IsMiniMenuOpen())
-            return;
-
-        PlayClick();
-        OpenMiniMenu();
-    }
-
-    private void OnResumeButtonClicked()
-    {
-        PlayClick();
-        CloseMiniMenu();
-    }
-
-    private void OnMainMenuButtonClicked()
-    {
-        PlayClick();
-
-        if (GameManager.Instance != null)
-            GameManager.Instance.SaveGame();
-
-        SceneManager.LoadScene("Main Menu");
     }
 
     private void HandlePanelButtonClick(GameObject targetPanel, RectTransform targetPanelRect)
@@ -195,17 +172,245 @@ public class UIPanelController : MonoBehaviour
 
     public void CloseAllPanels()
     {
-        if (shopPanel != null)
-            shopPanel.SetActive(false);
+        if (dinoShopPanel != null)
+            dinoShopPanel.SetActive(false);
 
-        if (foodInventoryPanel != null)
-            foodInventoryPanel.SetActive(false);
+        if (foodShopPanel != null)
+            foodShopPanel.SetActive(false);
 
         ShowFoodPanelVisuals();
 
         currentOpenPanel = null;
         currentOpenPanelRect = null;
-        foodPanelHiddenDuringDrag = false;
+    }
+
+    public void CloseFoodPanelOnly()
+    {
+        ShowFoodInventoryPanel();
+    }
+
+    public void CloseShopPanelOnly()
+    {
+        if (dinoShopPanel != null)
+            dinoShopPanel.SetActive(false);
+
+        if (currentOpenPanel == dinoShopPanel)
+        {
+            currentOpenPanel = null;
+            currentOpenPanelRect = null;
+        }
+    }
+
+    public void CloseFoodShopPanelOnly()
+    {
+        if (foodShopPanel != null)
+            foodShopPanel.SetActive(false);
+
+        if (currentOpenPanel == foodShopPanel)
+        {
+            currentOpenPanel = null;
+            currentOpenPanelRect = null;
+        }
+    }
+
+    public void HideFoodPanelDuringDrag()
+    {
+        ShowFoodInventoryPanel();
+    }
+
+    public void FinishFoodPanelDragClose()
+    {
+        ShowFoodInventoryPanel();
+    }
+
+    private void ShowFoodInventoryPanel()
+    {
+        if (foodInventoryPanel != null)
+            foodInventoryPanel.SetActive(true);
+
+        ShowFoodPanelVisuals();
+
+        if (currentOpenPanel == foodInventoryPanel)
+        {
+            currentOpenPanel = null;
+            currentOpenPanelRect = null;
+        }
+    }
+
+    private void ShowFoodPanelVisuals()
+    {
+        if (foodInventoryCanvasGroup == null && foodInventoryPanel != null)
+            foodInventoryCanvasGroup = foodInventoryPanel.GetComponent<CanvasGroup>();
+
+        if (foodInventoryCanvasGroup == null)
+            return;
+
+        foodInventoryCanvasGroup.alpha = 1f;
+        foodInventoryCanvasGroup.interactable = true;
+        foodInventoryCanvasGroup.blocksRaycasts = true;
+    }
+
+    public RectTransform GetFoodPanelRect()
+    {
+        return foodInventoryPanelRect;
+    }
+
+    public RectTransform GetShopPanelRect()
+    {
+        return dinoShopPanelRect;
+    }
+
+    public bool IsAnyPanelOpen()
+    {
+        return currentOpenPanel != null;
+    }
+
+    public bool IsFoodPanelOpen()
+    {
+        return foodInventoryPanel != null && foodInventoryPanel.activeSelf;
+    }
+
+    public bool IsShopPanelOpen()
+    {
+        return currentOpenPanel == dinoShopPanel || currentOpenPanel == foodShopPanel;
+    }
+
+    public bool IsDinoShopPanelOpen()
+    {
+        return currentOpenPanel == dinoShopPanel;
+    }
+
+    public bool IsFoodShopPanelOpen()
+    {
+        return currentOpenPanel == foodShopPanel;
+    }
+
+    private void PlayClick()
+    {
+        if (AudioManager.Instanse != null)
+            AudioManager.Instanse.PlayClick();
+    }
+
+    private bool IsClickInsideRect(RectTransform rect, Vector2 screenPosition)
+    {
+        if (rect == null)
+            return false;
+
+        return RectTransformUtility.RectangleContainsScreenPoint(
+            rect,
+            screenPosition,
+            null
+        );
+    }
+
+    private bool IsClickOnButton(Vector2 screenPosition)
+    {
+        if (IsClickOnAnyUIButton(screenPosition))
+            return true;
+
+        if (IsClickInsideButton(dinoShopButton, screenPosition))
+            return true;
+
+        if (IsClickInsideButton(foodShopButton, screenPosition))
+            return true;
+
+        if (IsClickInsideButton(dinoShopCloseButton, screenPosition))
+            return true;
+
+        if (IsClickInsideButton(foodShopCloseButton, screenPosition))
+            return true;
+
+        return false;
+    }
+
+    private bool IsClickOnAnyUIButton(Vector2 screenPosition)
+    {
+        if (EventSystem.current == null)
+            return false;
+
+        PointerEventData pointerData = new PointerEventData(EventSystem.current);
+        pointerData.position = screenPosition;
+
+        uiRaycastResults.Clear();
+        EventSystem.current.RaycastAll(pointerData, uiRaycastResults);
+
+        foreach (RaycastResult result in uiRaycastResults)
+        {
+            if (result.gameObject == null)
+                continue;
+
+            if (result.gameObject.GetComponentInParent<Button>() != null)
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool IsClickInsideButton(Button button, Vector2 screenPosition)
+    {
+        if (button == null)
+            return false;
+
+        RectTransform rect = button.GetComponent<RectTransform>();
+
+        if (rect == null)
+            return false;
+
+        return RectTransformUtility.RectangleContainsScreenPoint(
+            rect,
+            screenPosition,
+            null
+        );
+    }
+
+    private bool WasPointerPressedThisFrame()
+    {
+#if ENABLE_INPUT_SYSTEM
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+            return true;
+
+        if (Touchscreen.current != null &&
+            Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
+            return true;
+
+        return false;
+#else
+        if (Input.GetMouseButtonDown(0))
+            return true;
+
+        if (Input.touchCount > 0 &&
+            Input.GetTouch(0).phase == TouchPhase.Began)
+            return true;
+
+        return false;
+#endif
+    }
+
+    private Vector2 GetPointerScreenPosition()
+    {
+#if ENABLE_INPUT_SYSTEM
+        if (Mouse.current != null)
+            return Mouse.current.position.ReadValue();
+
+        if (Touchscreen.current != null)
+            return Touchscreen.current.primaryTouch.position.ReadValue();
+
+        return Vector2.zero;
+#else
+        if (Input.touchCount > 0)
+            return Input.GetTouch(0).position;
+
+        return Input.mousePosition;
+#endif
+    }
+
+    private void OnMiniMenuButtonClicked()
+    {
+        if (IsMiniMenuOpen())
+            return;
+
+        PlayClick();
+        OpenMiniMenu();
     }
 
     public void OpenMiniMenu()
@@ -236,6 +441,17 @@ public class UIPanelController : MonoBehaviour
         }
     }
 
+    private bool IsMiniMenuOpen()
+    {
+        return miniMenuPanel != null && miniMenuPanel.activeSelf;
+    }
+
+    private void OnResumeButtonClicked()
+    {
+        PlayClick();
+        CloseMiniMenu();
+    }
+
     public void CloseMiniMenu()
     {
         if (miniMenuPanel != null)
@@ -254,144 +470,14 @@ public class UIPanelController : MonoBehaviour
         }
     }
 
-    private bool HandleMiniMenuButtonFallback()
+    private void OnMainMenuButtonClicked()
     {
-        if (IsMiniMenuOpen())
-            return false;
+        PlayClick();
 
-        if (miniMenuButton == null)
-            return false;
+        if (GameManager.Instance != null)
+            GameManager.Instance.SaveGame();
 
-        if (!WasPointerPressedThisFrame())
-            return false;
-
-        Vector2 screenPosition = GetPointerScreenPosition();
-
-        if (!IsClickInsideButton(miniMenuButton, screenPosition))
-            return false;
-
-        OnMiniMenuButtonClicked();
-        return true;
-    }
-
-    private bool IsMiniMenuOpen()
-    {
-        return miniMenuPanel != null && miniMenuPanel.activeSelf;
-    }
-
-    public void CloseFoodPanelOnly()
-    {
-        if (foodInventoryPanel != null)
-            foodInventoryPanel.SetActive(false);
-
-        ShowFoodPanelVisuals();
-
-        if (currentOpenPanel == foodInventoryPanel)
-        {
-            currentOpenPanel = null;
-            currentOpenPanelRect = null;
-        }
-
-        foodPanelHiddenDuringDrag = false;
-    }
-
-    public void CloseShopPanelOnly()
-    {
-        if (shopPanel != null)
-            shopPanel.SetActive(false);
-
-        if (currentOpenPanel == shopPanel)
-        {
-            currentOpenPanel = null;
-            currentOpenPanelRect = null;
-        }
-    }
-
-    public void HideFoodPanelDuringDrag()
-    {
-        if (foodInventoryPanel == null)
-            return;
-
-        if (!foodInventoryPanel.activeSelf)
-            return;
-
-        if (foodInventoryCanvasGroup == null)
-            foodInventoryCanvasGroup = foodInventoryPanel.GetComponent<CanvasGroup>();
-
-        if (foodInventoryCanvasGroup == null)
-        {
-            Debug.LogWarning("FoodInventoryPanel has no CanvasGroup.");
-            return;
-        }
-
-        foodInventoryCanvasGroup.alpha = 0f;
-        foodInventoryCanvasGroup.interactable = false;
-        foodInventoryCanvasGroup.blocksRaycasts = false;
-
-        foodPanelHiddenDuringDrag = true;
-    }
-
-    public void FinishFoodPanelDragClose()
-    {
-        if (!foodPanelHiddenDuringDrag)
-            return;
-
-        if (foodInventoryPanel != null)
-            foodInventoryPanel.SetActive(false);
-
-        ShowFoodPanelVisuals();
-
-        if (currentOpenPanel == foodInventoryPanel)
-        {
-            currentOpenPanel = null;
-            currentOpenPanelRect = null;
-        }
-
-        foodPanelHiddenDuringDrag = false;
-    }
-
-    private void ShowFoodPanelVisuals()
-    {
-        if (foodInventoryCanvasGroup == null && foodInventoryPanel != null)
-            foodInventoryCanvasGroup = foodInventoryPanel.GetComponent<CanvasGroup>();
-
-        if (foodInventoryCanvasGroup == null)
-            return;
-
-        foodInventoryCanvasGroup.alpha = 1f;
-        foodInventoryCanvasGroup.interactable = true;
-        foodInventoryCanvasGroup.blocksRaycasts = true;
-    }
-
-    public RectTransform GetFoodPanelRect()
-    {
-        return foodInventoryPanelRect;
-    }
-
-    public RectTransform GetShopPanelRect()
-    {
-        return shopPanelRect;
-    }
-
-    public bool IsAnyPanelOpen()
-    {
-        return currentOpenPanel != null;
-    }
-
-    public bool IsFoodPanelOpen()
-    {
-        return currentOpenPanel == foodInventoryPanel;
-    }
-
-    public bool IsShopPanelOpen()
-    {
-        return currentOpenPanel == shopPanel;
-    }
-
-    private void PlayClick()
-    {
-        if (AudioManager.Instanse != null)
-            AudioManager.Instanse.PlayClick();
+        SceneManager.LoadScene("Main Menu");
     }
 
     private void FindMiniMenuReferences()
@@ -578,93 +664,8 @@ public class UIPanelController : MonoBehaviour
             target.AddComponent<UIAudioClickFeedback>();
     }
 
-    private bool IsClickInsideRect(RectTransform rect, Vector2 screenPosition)
-    {
-        if (rect == null)
-            return false;
-
-        return RectTransformUtility.RectangleContainsScreenPoint(
-            rect,
-            screenPosition,
-            null
-        );
-    }
-
-    private bool IsClickOnButton(Vector2 screenPosition)
-    {
-        if (IsClickInsideButton(shopButton, screenPosition))
-            return true;
-
-        if (IsClickInsideButton(foodButton, screenPosition))
-            return true;
-
-        if (IsClickInsideButton(shopCloseButton, screenPosition))
-            return true;
-
-        if (IsClickInsideButton(foodCloseButton, screenPosition))
-            return true;
-
-        return false;
-    }
-
-    private bool IsClickInsideButton(Button button, Vector2 screenPosition)
-    {
-        if (button == null)
-            return false;
-
-        RectTransform rect = button.GetComponent<RectTransform>();
-
-        if (rect == null)
-            return false;
-
-        return RectTransformUtility.RectangleContainsScreenPoint(
-            rect,
-            screenPosition,
-            null
-        );
-    }
-
-    private bool WasPointerPressedThisFrame()
-    {
-#if ENABLE_INPUT_SYSTEM
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
-            return true;
-
-        if (Touchscreen.current != null &&
-            Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
-            return true;
-
-        return false;
-#else
-        if (Input.GetMouseButtonDown(0))
-            return true;
-
-        if (Input.touchCount > 0 &&
-            Input.GetTouch(0).phase == TouchPhase.Began)
-            return true;
-
-        return false;
-#endif
-    }
-
-    private Vector2 GetPointerScreenPosition()
-    {
-#if ENABLE_INPUT_SYSTEM
-        if (Mouse.current != null)
-            return Mouse.current.position.ReadValue();
-
-        if (Touchscreen.current != null)
-            return Touchscreen.current.primaryTouch.position.ReadValue();
-
-        return Vector2.zero;
-#else
-        if (Input.touchCount > 0)
-            return Input.GetTouch(0).position;
-
-        return Input.mousePosition;
-#endif
-    }
 }
+
 
 public class UIAudioClickFeedback : MonoBehaviour, IPointerDownHandler
 {
