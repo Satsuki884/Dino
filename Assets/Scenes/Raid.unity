@@ -1321,8 +1321,14 @@ MonoBehaviour:
     renderer: {fileID: 2017769552}
     sprite: {fileID: 5845572926807173259, guid: d92ef1838bf4e9d41ab0b3754629eb05, type: 3}
     sortingOrder: 15
-    alpha: 0.582
+    alpha: 1
     zOffset: 3
+  raid:
+    renderer: {fileID: 0}
+    sprite: {fileID: 0}
+    sortingOrder: 10
+    alpha: 1
+    zOffset: 2.5
   shadow:
     renderer: {fileID: 1099775209}
     sprite: {fileID: 5845572926807173259, guid: d92ef1838bf4e9d41ab0b3754629eb05, type: 3}
