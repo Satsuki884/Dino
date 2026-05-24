@@ -35,6 +35,8 @@ public class FoodUI : MonoBehaviour
 
         bool hasFood = amount > 0;
 
+        if (amountText != null)
+            amountText.text = CoinFormatter.FormatNumber(amount);
 
         if (iconImage != null)
         {

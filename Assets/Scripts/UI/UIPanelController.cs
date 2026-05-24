@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -11,24 +12,22 @@ public class UIPanelController : MonoBehaviour
 {
     public static UIPanelController Instance;
 
-    [Header("Panels")]
-    public GameObject shopPanel;
+    [Header("Dino Shop")]
+    [FormerlySerializedAs("shopPanel")] public GameObject dinoShopPanel;
+    [FormerlySerializedAs("shopPanelRect")] public RectTransform dinoShopPanelRect;
+    [FormerlySerializedAs("shopButton")] public Button dinoShopButton;
+    [FormerlySerializedAs("shopCloseButton")] public Button dinoShopCloseButton;
+
+    [Header("Food Shop")]
+    public GameObject foodShopPanel;
+    public RectTransform foodShopPanelRect;
+    [FormerlySerializedAs("foodButton")] public Button foodShopButton;
+    [FormerlySerializedAs("foodCloseButton")] public Button foodShopCloseButton;
+
+    [Header("Food Inventory")]
     public GameObject foodInventoryPanel;
-
-    [Header("Panel Rects")]
-    public RectTransform shopPanelRect;
     public RectTransform foodInventoryPanelRect;
-
-    [Header("Canvas Groups")]
     public CanvasGroup foodInventoryCanvasGroup;
-
-    [Header("Open Buttons")]
-    public Button shopButton;
-    public Button foodButton;
-
-    [Header("Close Buttons")]
-    public Button shopCloseButton;
-    public Button foodCloseButton;
 
     [Header("Close Settings")]
     public bool closeWhenClickOutside = true;
@@ -49,17 +48,23 @@ public class UIPanelController : MonoBehaviour
         if (foodInventoryCanvasGroup == null && foodInventoryPanel != null)
             foodInventoryCanvasGroup = foodInventoryPanel.GetComponent<CanvasGroup>();
 
-        if (shopButton != null)
-            shopButton.onClick.AddListener(OnShopButtonClicked);
+        if (dinoShopButton != null)
+            dinoShopButton.onClick.AddListener(OnDinoShopButtonClicked);
 
-        if (foodButton != null)
-            foodButton.onClick.AddListener(OnFoodButtonClicked);
+        if (foodShopButton != null)
+            foodShopButton.onClick.AddListener(OnFoodShopButtonClicked);
 
-        if (shopCloseButton != null)
-            shopCloseButton.onClick.AddListener(OnCloseButtonClicked);
+        if (dinoShopCloseButton != null)
+            dinoShopCloseButton.onClick.AddListener(OnCloseButtonClicked);
 
-        if (foodCloseButton != null)
-            foodCloseButton.onClick.AddListener(OnCloseButtonClicked);
+        if (foodShopCloseButton != null)
+            foodShopCloseButton.onClick.AddListener(OnCloseButtonClicked);
+
+        if (foodShopPanel == null)
+            Debug.LogWarning("FoodShopPanel is not assigned in UIPanelController. Assign the food shop panel separately from FoodInventoryPanel.");
+
+        if (foodInventoryPanel == null)
+            Debug.LogWarning("FoodInventoryPanel is not assigned in UIPanelController. Food inventory should stay visible.");
 
         CloseAllPanels();
         ShowFoodInventoryPanel();
@@ -96,16 +101,16 @@ public class UIPanelController : MonoBehaviour
         CloseAllPanels();
     }
 
-    private void OnShopButtonClicked()
+    private void OnDinoShopButtonClicked()
     {
         PlayClick();
-        HandlePanelButtonClick(shopPanel, shopPanelRect);
+        HandlePanelButtonClick(dinoShopPanel, dinoShopPanelRect);
     }
 
-    private void OnFoodButtonClicked()
+    private void OnFoodShopButtonClicked()
     {
         PlayClick();
-        ShowFoodInventoryPanel();
+        HandlePanelButtonClick(foodShopPanel, foodShopPanelRect);
     }
 
     private void OnCloseButtonClicked()
@@ -151,8 +156,11 @@ public class UIPanelController : MonoBehaviour
 
     public void CloseAllPanels()
     {
-        if (shopPanel != null)
-            shopPanel.SetActive(false);
+        if (dinoShopPanel != null)
+            dinoShopPanel.SetActive(false);
+
+        if (foodShopPanel != null)
+            foodShopPanel.SetActive(false);
 
         ShowFoodPanelVisuals();
 
@@ -167,10 +175,22 @@ public class UIPanelController : MonoBehaviour
 
     public void CloseShopPanelOnly()
     {
-        if (shopPanel != null)
-            shopPanel.SetActive(false);
+        if (dinoShopPanel != null)
+            dinoShopPanel.SetActive(false);
 
-        if (currentOpenPanel == shopPanel)
+        if (currentOpenPanel == dinoShopPanel)
+        {
+            currentOpenPanel = null;
+            currentOpenPanelRect = null;
+        }
+    }
+
+    public void CloseFoodShopPanelOnly()
+    {
+        if (foodShopPanel != null)
+            foodShopPanel.SetActive(false);
+
+        if (currentOpenPanel == foodShopPanel)
         {
             currentOpenPanel = null;
             currentOpenPanelRect = null;
@@ -221,7 +241,7 @@ public class UIPanelController : MonoBehaviour
 
     public RectTransform GetShopPanelRect()
     {
-        return shopPanelRect;
+        return dinoShopPanelRect;
     }
 
     public bool IsAnyPanelOpen()
@@ -236,7 +256,17 @@ public class UIPanelController : MonoBehaviour
 
     public bool IsShopPanelOpen()
     {
-        return currentOpenPanel == shopPanel;
+        return currentOpenPanel == dinoShopPanel || currentOpenPanel == foodShopPanel;
+    }
+
+    public bool IsDinoShopPanelOpen()
+    {
+        return currentOpenPanel == dinoShopPanel;
+    }
+
+    public bool IsFoodShopPanelOpen()
+    {
+        return currentOpenPanel == foodShopPanel;
     }
 
     private void PlayClick()
@@ -262,16 +292,16 @@ public class UIPanelController : MonoBehaviour
         if (IsClickOnAnyUIButton(screenPosition))
             return true;
 
-        if (IsClickInsideButton(shopButton, screenPosition))
+        if (IsClickInsideButton(dinoShopButton, screenPosition))
             return true;
 
-        if (IsClickInsideButton(foodButton, screenPosition))
+        if (IsClickInsideButton(foodShopButton, screenPosition))
             return true;
 
-        if (IsClickInsideButton(shopCloseButton, screenPosition))
+        if (IsClickInsideButton(dinoShopCloseButton, screenPosition))
             return true;
 
-        if (IsClickInsideButton(foodCloseButton, screenPosition))
+        if (IsClickInsideButton(foodShopCloseButton, screenPosition))
             return true;
 
         return false;
