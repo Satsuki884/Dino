@@ -61,6 +61,10 @@ public class UIPanelController : MonoBehaviour
 
     private void Start()
     {
+        FindMiniMenuReferences();
+        ConfigureMiniMenu();
+        CloseMiniMenu();
+
         if (foodInventoryCanvasGroup == null && foodInventoryPanel != null)
             foodInventoryCanvasGroup = foodInventoryPanel.GetComponent<CanvasGroup>();
 
