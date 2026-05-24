@@ -18,22 +18,30 @@ MonoBehaviour:
   startCalories: 1500
   moveSpeed: 1.2
   growthTimeMultiplier: 2
+  coinPerRaid: 1
+  timeToRaid: 10
   stages:
   - stageName: Stage 1
-    sprite: {fileID: 3512306599696331270, guid: 36c76571ac5d9f940ae85ba4145e4827, type: 3}
+    sprite: {fileID: -7475038807813967987, guid: 903a67f1a79c8d34abdd580bf91499b7, type: 3}
     ticksToNextStage: 25
     caloriesConsumePerTick: 24
     coinsPerTick: 1
     canMove: 0
+    spawnedCoinIntervalMin: 5
+    spawnedCoinIntervalMax: 10
   - stageName: Stage 2
-    sprite: {fileID: 3512306599696331270, guid: 36c76571ac5d9f940ae85ba4145e4827, type: 3}
+    sprite: {fileID: -6960910802043165949, guid: 7238037441c955544991ada7416d21c1, type: 3}
     ticksToNextStage: 45
     caloriesConsumePerTick: 20
     coinsPerTick: 17
     canMove: 1
+    spawnedCoinIntervalMin: 5
+    spawnedCoinIntervalMax: 10
   - stageName: Stage 3
-    sprite: {fileID: 3512306599696331270, guid: 36c76571ac5d9f940ae85ba4145e4827, type: 3}
+    sprite: {fileID: 3945032398801038256, guid: c25815b421731094d8d4d7279224028a, type: 3}
     ticksToNextStage: 0
     caloriesConsumePerTick: 16
     coinsPerTick: 50
     canMove: 1
+    spawnedCoinIntervalMin: 5
+    spawnedCoinIntervalMax: 10

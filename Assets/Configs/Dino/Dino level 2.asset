@@ -22,7 +22,7 @@ MonoBehaviour:
   timeToRaid: 20
   stages:
   - stageName: Stage 1
-    sprite: {fileID: -8825533296577842504, guid: 042b87bef168ab94e8f59367d0cc034f, type: 3}
+    sprite: {fileID: -7068188157426101490, guid: fa1bb6b18a780704ea23f4ce0adde267, type: 3}
     ticksToNextStage: 8
     caloriesConsumePerTick: 12
     coinsPerTick: 0.2
@@ -30,7 +30,7 @@ MonoBehaviour:
     spawnedCoinIntervalMin: 5
     spawnedCoinIntervalMax: 10
   - stageName: Stage 2
-    sprite: {fileID: 1451478870644479156, guid: 5195c0e281f7f874ab24d1648a2a4d10, type: 3}
+    sprite: {fileID: -5587481752912235445, guid: 92381756f817f8944aae6dd55fcc5cc1, type: 3}
     ticksToNextStage: 30
     caloriesConsumePerTick: 10
     coinsPerTick: 2
@@ -38,7 +38,7 @@ MonoBehaviour:
     spawnedCoinIntervalMin: 5
     spawnedCoinIntervalMax: 10
   - stageName: Stage 3
-    sprite: {fileID: 1451478870644479156, guid: 5195c0e281f7f874ab24d1648a2a4d10, type: 3}
+    sprite: {fileID: 3512306599696331270, guid: 8088e8b37cecb8e4697ae757983a4f5d, type: 3}
     ticksToNextStage: 0
     caloriesConsumePerTick: 6
     coinsPerTick: 5
