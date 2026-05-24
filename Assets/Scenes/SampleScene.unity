@@ -2707,7 +2707,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 20
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 6938427135085785473, guid: 8fed6111ec83fb94dab3bf9f41425b79, type: 3}
+  m_Sprite: {fileID: -2477563284366177157, guid: 869631ce58a035a4db621f13ab0de87a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -6200,7 +6200,7 @@ MonoBehaviour:
   raid:
     renderer: {fileID: 745828295}
     sprite: {fileID: -2477563284366177157, guid: 869631ce58a035a4db621f13ab0de87a, type: 3}
-    sortingOrder: 10
+    sortingOrder: 1
     alpha: 1
     zOffset: 2.5
   shadow:
