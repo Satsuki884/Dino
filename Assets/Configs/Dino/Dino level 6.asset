@@ -16,7 +16,7 @@ MonoBehaviour:
   dinoName: Dino level 6
   buyPrice: 500
   startCalories: 2550
-  moveSpeed: 1.2
+  moveSpeed: 0.8
   growthTimeMultiplier: 2
   coinPerRaid: 1
   timeToRaid: 10

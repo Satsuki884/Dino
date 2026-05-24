@@ -16,7 +16,7 @@ MonoBehaviour:
   dinoName: 'Dino level 2 '
   buyPrice: 25
   startCalories: 396
-  moveSpeed: 1.2
+  moveSpeed: 1.1
   growthTimeMultiplier: 2
   coinPerRaid: 30
   timeToRaid: 20

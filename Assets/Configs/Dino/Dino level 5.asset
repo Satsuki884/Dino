@@ -16,7 +16,7 @@ MonoBehaviour:
   dinoName: Dino level 5
   buyPrice: 500
   startCalories: 2550
-  moveSpeed: 1.2
+  moveSpeed: 1.3
   growthTimeMultiplier: 2
   coinPerRaid: 1
   timeToRaid: 10

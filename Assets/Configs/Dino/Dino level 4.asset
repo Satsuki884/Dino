@@ -16,7 +16,7 @@ MonoBehaviour:
   dinoName: Dino level 4
   buyPrice: 125
   startCalories: 1500
-  moveSpeed: 1.2
+  moveSpeed: 0.7
   growthTimeMultiplier: 2
   coinPerRaid: 1
   timeToRaid: 10

@@ -16,7 +16,7 @@ MonoBehaviour:
   dinoName: Dino level 7
   buyPrice: 500
   startCalories: 2550
-  moveSpeed: 1.2
+  moveSpeed: 0.9
   growthTimeMultiplier: 2
   coinPerRaid: 1
   timeToRaid: 10
