@@ -1,8 +1,7 @@
 using UnityEngine;
-using UnityEngine.UI;
-using System.Collections.Generic;
 using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -12,22 +11,32 @@ public class UIPanelController : MonoBehaviour
 {
     public static UIPanelController Instance;
 
-    [Header("Dino Shop")]
-    [FormerlySerializedAs("shopPanel")] public GameObject dinoShopPanel;
-    [FormerlySerializedAs("shopPanelRect")] public RectTransform dinoShopPanelRect;
-    [FormerlySerializedAs("shopButton")] public Button dinoShopButton;
-    [FormerlySerializedAs("shopCloseButton")] public Button dinoShopCloseButton;
-
-    [Header("Food Shop")]
-    public GameObject foodShopPanel;
-    public RectTransform foodShopPanelRect;
-    [FormerlySerializedAs("foodButton")] public Button foodShopButton;
-    [FormerlySerializedAs("foodCloseButton")] public Button foodShopCloseButton;
-
-    [Header("Food Inventory")]
+    [Header("Panels")]
+    public GameObject shopPanel;
     public GameObject foodInventoryPanel;
+
+    [Header("Panel Rects")]
+    public RectTransform shopPanelRect;
     public RectTransform foodInventoryPanelRect;
+
+    [Header("Canvas Groups")]
     public CanvasGroup foodInventoryCanvasGroup;
+
+    [Header("Open Buttons")]
+    public Button shopButton;
+    public Button foodButton;
+
+    [Header("Close Buttons")]
+    public Button shopCloseButton;
+    public Button foodCloseButton;
+
+    [Header("Mini Menu")]
+    public GameObject miniMenuPanel;
+    public Button miniMenuButton;
+    public Button resumeButton;
+    public Button mainMenuButton;
+    public Slider musicVolumeSlider;
+    public Slider sfxVolumeSlider;
 
     [Header("Close Settings")]
     public bool closeWhenClickOutside = true;
@@ -36,7 +45,12 @@ public class UIPanelController : MonoBehaviour
     private RectTransform currentOpenPanelRect;
 
     private bool ignoreNextOutsideClick;
-    private readonly List<RaycastResult> uiRaycastResults = new List<RaycastResult>();
+    private bool foodPanelHiddenDuringDrag;
+    private GameObject miniMenuInputBlocker;
+    private CanvasGroup miniMenuCanvasGroup;
+    private Canvas miniMenuCanvas;
+    private bool originalMiniMenuCanvasOverrideSorting;
+    private int originalMiniMenuCanvasSortingOrder;
 
     private void Awake()
     {
@@ -48,30 +62,30 @@ public class UIPanelController : MonoBehaviour
         if (foodInventoryCanvasGroup == null && foodInventoryPanel != null)
             foodInventoryCanvasGroup = foodInventoryPanel.GetComponent<CanvasGroup>();
 
-        if (dinoShopButton != null)
-            dinoShopButton.onClick.AddListener(OnDinoShopButtonClicked);
+        FindMiniMenuReferences();
+        ConfigureMiniMenu();
 
-        if (foodShopButton != null)
-            foodShopButton.onClick.AddListener(OnFoodShopButtonClicked);
+        if (shopButton != null)
+            shopButton.onClick.AddListener(OnShopButtonClicked);
 
-        if (dinoShopCloseButton != null)
-            dinoShopCloseButton.onClick.AddListener(OnCloseButtonClicked);
+        if (foodButton != null)
+            foodButton.onClick.AddListener(OnFoodButtonClicked);
 
-        if (foodShopCloseButton != null)
-            foodShopCloseButton.onClick.AddListener(OnCloseButtonClicked);
+        if (shopCloseButton != null)
+            shopCloseButton.onClick.AddListener(OnCloseButtonClicked);
 
-        if (foodShopPanel == null)
-            Debug.LogWarning("FoodShopPanel is not assigned in UIPanelController. Assign the food shop panel separately from FoodInventoryPanel.");
-
-        if (foodInventoryPanel == null)
-            Debug.LogWarning("FoodInventoryPanel is not assigned in UIPanelController. Food inventory should stay visible.");
+        if (foodCloseButton != null)
+            foodCloseButton.onClick.AddListener(OnCloseButtonClicked);
 
         CloseAllPanels();
-        ShowFoodInventoryPanel();
+        CloseMiniMenu();
     }
 
     private void Update()
     {
+        if (HandleMiniMenuButtonFallback())
+            return;
+
         if (DraggableFoodUI.IsDraggingFood)
             return;
 
@@ -101,22 +115,47 @@ public class UIPanelController : MonoBehaviour
         CloseAllPanels();
     }
 
-    private void OnDinoShopButtonClicked()
+    private void OnShopButtonClicked()
     {
         PlayClick();
-        HandlePanelButtonClick(dinoShopPanel, dinoShopPanelRect);
+        HandlePanelButtonClick(shopPanel, shopPanelRect);
     }
 
-    private void OnFoodShopButtonClicked()
+    private void OnFoodButtonClicked()
     {
         PlayClick();
-        HandlePanelButtonClick(foodShopPanel, foodShopPanelRect);
+        HandlePanelButtonClick(foodInventoryPanel, foodInventoryPanelRect);
     }
 
     private void OnCloseButtonClicked()
     {
         PlayClick();
         CloseAllPanels();
+    }
+
+    private void OnMiniMenuButtonClicked()
+    {
+        if (IsMiniMenuOpen())
+            return;
+
+        PlayClick();
+        OpenMiniMenu();
+    }
+
+    private void OnResumeButtonClicked()
+    {
+        PlayClick();
+        CloseMiniMenu();
+    }
+
+    private void OnMainMenuButtonClicked()
+    {
+        PlayClick();
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.SaveGame();
+
+        SceneManager.LoadScene("Main Menu");
     }
 
     private void HandlePanelButtonClick(GameObject targetPanel, RectTransform targetPanelRect)
@@ -156,61 +195,94 @@ public class UIPanelController : MonoBehaviour
 
     public void CloseAllPanels()
     {
-        if (dinoShopPanel != null)
-            dinoShopPanel.SetActive(false);
+        if (shopPanel != null)
+            shopPanel.SetActive(false);
 
-        if (foodShopPanel != null)
-            foodShopPanel.SetActive(false);
+        if (foodInventoryPanel != null)
+            foodInventoryPanel.SetActive(false);
 
         ShowFoodPanelVisuals();
 
         currentOpenPanel = null;
         currentOpenPanelRect = null;
+        foodPanelHiddenDuringDrag = false;
+    }
+
+    public void OpenMiniMenu()
+    {
+        if (miniMenuPanel == null)
+            return;
+
+        BindMiniMenuVolumeSliders();
+        CloseAllPanels();
+        EnsureMiniMenuInputBlocker();
+
+        if (miniMenuInputBlocker != null)
+        {
+            miniMenuInputBlocker.SetActive(true);
+            miniMenuInputBlocker.transform.SetAsLastSibling();
+        }
+
+        RaiseMiniMenuCanvas();
+
+        miniMenuPanel.SetActive(true);
+        miniMenuPanel.transform.SetAsLastSibling();
+
+        if (miniMenuCanvasGroup != null)
+        {
+            miniMenuCanvasGroup.alpha = 1f;
+            miniMenuCanvasGroup.interactable = true;
+            miniMenuCanvasGroup.blocksRaycasts = true;
+        }
+    }
+
+    public void CloseMiniMenu()
+    {
+        if (miniMenuPanel != null)
+            miniMenuPanel.SetActive(false);
+
+        if (miniMenuInputBlocker != null)
+            miniMenuInputBlocker.SetActive(false);
+
+        RestoreMiniMenuCanvas();
+
+        if (miniMenuCanvasGroup != null)
+        {
+            miniMenuCanvasGroup.alpha = 1f;
+            miniMenuCanvasGroup.interactable = true;
+            miniMenuCanvasGroup.blocksRaycasts = true;
+        }
+    }
+
+    private bool HandleMiniMenuButtonFallback()
+    {
+        if (IsMiniMenuOpen())
+            return false;
+
+        if (miniMenuButton == null)
+            return false;
+
+        if (!WasPointerPressedThisFrame())
+            return false;
+
+        Vector2 screenPosition = GetPointerScreenPosition();
+
+        if (!IsClickInsideButton(miniMenuButton, screenPosition))
+            return false;
+
+        OnMiniMenuButtonClicked();
+        return true;
+    }
+
+    private bool IsMiniMenuOpen()
+    {
+        return miniMenuPanel != null && miniMenuPanel.activeSelf;
     }
 
     public void CloseFoodPanelOnly()
     {
-        ShowFoodInventoryPanel();
-    }
-
-    public void CloseShopPanelOnly()
-    {
-        if (dinoShopPanel != null)
-            dinoShopPanel.SetActive(false);
-
-        if (currentOpenPanel == dinoShopPanel)
-        {
-            currentOpenPanel = null;
-            currentOpenPanelRect = null;
-        }
-    }
-
-    public void CloseFoodShopPanelOnly()
-    {
-        if (foodShopPanel != null)
-            foodShopPanel.SetActive(false);
-
-        if (currentOpenPanel == foodShopPanel)
-        {
-            currentOpenPanel = null;
-            currentOpenPanelRect = null;
-        }
-    }
-
-    public void HideFoodPanelDuringDrag()
-    {
-        ShowFoodInventoryPanel();
-    }
-
-    public void FinishFoodPanelDragClose()
-    {
-        ShowFoodInventoryPanel();
-    }
-
-    private void ShowFoodInventoryPanel()
-    {
         if (foodInventoryPanel != null)
-            foodInventoryPanel.SetActive(true);
+            foodInventoryPanel.SetActive(false);
 
         ShowFoodPanelVisuals();
 
@@ -219,6 +291,63 @@ public class UIPanelController : MonoBehaviour
             currentOpenPanel = null;
             currentOpenPanelRect = null;
         }
+
+        foodPanelHiddenDuringDrag = false;
+    }
+
+    public void CloseShopPanelOnly()
+    {
+        if (shopPanel != null)
+            shopPanel.SetActive(false);
+
+        if (currentOpenPanel == shopPanel)
+        {
+            currentOpenPanel = null;
+            currentOpenPanelRect = null;
+        }
+    }
+
+    public void HideFoodPanelDuringDrag()
+    {
+        if (foodInventoryPanel == null)
+            return;
+
+        if (!foodInventoryPanel.activeSelf)
+            return;
+
+        if (foodInventoryCanvasGroup == null)
+            foodInventoryCanvasGroup = foodInventoryPanel.GetComponent<CanvasGroup>();
+
+        if (foodInventoryCanvasGroup == null)
+        {
+            Debug.LogWarning("FoodInventoryPanel has no CanvasGroup.");
+            return;
+        }
+
+        foodInventoryCanvasGroup.alpha = 0f;
+        foodInventoryCanvasGroup.interactable = false;
+        foodInventoryCanvasGroup.blocksRaycasts = false;
+
+        foodPanelHiddenDuringDrag = true;
+    }
+
+    public void FinishFoodPanelDragClose()
+    {
+        if (!foodPanelHiddenDuringDrag)
+            return;
+
+        if (foodInventoryPanel != null)
+            foodInventoryPanel.SetActive(false);
+
+        ShowFoodPanelVisuals();
+
+        if (currentOpenPanel == foodInventoryPanel)
+        {
+            currentOpenPanel = null;
+            currentOpenPanelRect = null;
+        }
+
+        foodPanelHiddenDuringDrag = false;
     }
 
     private void ShowFoodPanelVisuals()
@@ -241,7 +370,7 @@ public class UIPanelController : MonoBehaviour
 
     public RectTransform GetShopPanelRect()
     {
-        return dinoShopPanelRect;
+        return shopPanelRect;
     }
 
     public bool IsAnyPanelOpen()
@@ -251,28 +380,202 @@ public class UIPanelController : MonoBehaviour
 
     public bool IsFoodPanelOpen()
     {
-        return foodInventoryPanel != null && foodInventoryPanel.activeSelf;
+        return currentOpenPanel == foodInventoryPanel;
     }
 
     public bool IsShopPanelOpen()
     {
-        return currentOpenPanel == dinoShopPanel || currentOpenPanel == foodShopPanel;
-    }
-
-    public bool IsDinoShopPanelOpen()
-    {
-        return currentOpenPanel == dinoShopPanel;
-    }
-
-    public bool IsFoodShopPanelOpen()
-    {
-        return currentOpenPanel == foodShopPanel;
+        return currentOpenPanel == shopPanel;
     }
 
     private void PlayClick()
     {
         if (AudioManager.Instanse != null)
             AudioManager.Instanse.PlayClick();
+    }
+
+    private void FindMiniMenuReferences()
+    {
+        if (miniMenuPanel == null)
+            miniMenuPanel = FindSceneObject("MinMenu_panel");
+
+        if (miniMenuButton == null)
+            miniMenuButton = FindButton("MinMenu_button");
+
+        if (resumeButton == null)
+            resumeButton = FindButton("Resume_but");
+
+        if (mainMenuButton == null)
+            mainMenuButton = FindButton("Main_menu_but");
+
+        if (musicVolumeSlider == null)
+            musicVolumeSlider = FindSlider("Music_vol");
+
+        if (sfxVolumeSlider == null)
+            sfxVolumeSlider = FindSlider("SFX_vol");
+
+        if (miniMenuPanel != null)
+        {
+            miniMenuCanvasGroup = miniMenuPanel.GetComponent<CanvasGroup>();
+            miniMenuCanvas = miniMenuPanel.GetComponentInParent<Canvas>();
+
+            if (miniMenuCanvas != null)
+            {
+                originalMiniMenuCanvasOverrideSorting = miniMenuCanvas.overrideSorting;
+                originalMiniMenuCanvasSortingOrder = miniMenuCanvas.sortingOrder;
+            }
+        }
+    }
+
+    private void ConfigureMiniMenu()
+    {
+        if (miniMenuButton != null)
+        {
+            miniMenuButton.onClick.RemoveListener(OnMiniMenuButtonClicked);
+            miniMenuButton.onClick.AddListener(OnMiniMenuButtonClicked);
+        }
+
+        if (resumeButton != null)
+        {
+            resumeButton.onClick.RemoveListener(OnResumeButtonClicked);
+            resumeButton.onClick.AddListener(OnResumeButtonClicked);
+        }
+
+        if (mainMenuButton != null)
+        {
+            mainMenuButton.onClick.RemoveListener(OnMainMenuButtonClicked);
+            mainMenuButton.onClick.AddListener(OnMainMenuButtonClicked);
+        }
+
+        if (musicVolumeSlider != null)
+        {
+            AddClickFeedback(musicVolumeSlider.gameObject);
+        }
+
+        if (sfxVolumeSlider != null)
+        {
+            AddClickFeedback(sfxVolumeSlider.gameObject);
+        }
+
+        BindMiniMenuVolumeSliders();
+        EnsureMiniMenuInputBlocker();
+    }
+
+    private void BindMiniMenuVolumeSliders()
+    {
+        if (AudioManager.Instanse == null)
+            return;
+
+        if (musicVolumeSlider != null)
+        {
+            musicVolumeSlider.onValueChanged.RemoveListener(AudioManager.Instanse.SetMusicVolume);
+            musicVolumeSlider.onValueChanged.AddListener(AudioManager.Instanse.SetMusicVolume);
+            AudioManager.Instanse.SetMusicVolume(musicVolumeSlider.value);
+        }
+
+        if (sfxVolumeSlider != null)
+        {
+            sfxVolumeSlider.onValueChanged.RemoveListener(AudioManager.Instanse.SetSFXVolume);
+            sfxVolumeSlider.onValueChanged.AddListener(AudioManager.Instanse.SetSFXVolume);
+            AudioManager.Instanse.SetSFXVolume(sfxVolumeSlider.value);
+        }
+    }
+
+    private void EnsureMiniMenuInputBlocker()
+    {
+        if (miniMenuInputBlocker != null)
+            return;
+
+        if (miniMenuPanel == null)
+            return;
+
+        Transform parent = miniMenuPanel.transform.parent;
+
+        if (parent == null)
+            return;
+
+        miniMenuInputBlocker = new GameObject("MiniMenu_InputBlocker");
+        miniMenuInputBlocker.transform.SetParent(parent, false);
+
+        RectTransform rect = miniMenuInputBlocker.AddComponent<RectTransform>();
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+
+        Image image = miniMenuInputBlocker.AddComponent<Image>();
+        image.color = new Color(0f, 0f, 0f, 0f);
+        image.raycastTarget = true;
+
+        miniMenuInputBlocker.SetActive(false);
+    }
+
+    private void RaiseMiniMenuCanvas()
+    {
+        if (miniMenuCanvas == null && miniMenuPanel != null)
+            miniMenuCanvas = miniMenuPanel.GetComponentInParent<Canvas>();
+
+        if (miniMenuCanvas == null)
+            return;
+
+        miniMenuCanvas.overrideSorting = true;
+        miniMenuCanvas.sortingOrder = 1000;
+    }
+
+    private void RestoreMiniMenuCanvas()
+    {
+        if (miniMenuCanvas == null)
+            return;
+
+        miniMenuCanvas.overrideSorting = originalMiniMenuCanvasOverrideSorting;
+        miniMenuCanvas.sortingOrder = originalMiniMenuCanvasSortingOrder;
+    }
+
+    private Button FindButton(string objectName)
+    {
+        GameObject found = FindSceneObject(objectName);
+        return found != null ? found.GetComponent<Button>() : null;
+    }
+
+    private Slider FindSlider(string objectName)
+    {
+        GameObject found = FindSceneObject(objectName);
+        return found != null ? found.GetComponent<Slider>() : null;
+    }
+
+    private GameObject FindSceneObject(string objectName)
+    {
+        GameObject found = GameObject.Find(objectName);
+
+        if (found != null)
+            return found;
+
+        Transform[] transforms = Resources.FindObjectsOfTypeAll<Transform>();
+
+        foreach (Transform transform in transforms)
+        {
+            if (transform == null)
+                continue;
+
+            if (transform.name != objectName)
+                continue;
+
+            if (!transform.gameObject.scene.IsValid())
+                continue;
+
+            return transform.gameObject;
+        }
+
+        return null;
+    }
+
+    private void AddClickFeedback(GameObject target)
+    {
+        if (target == null)
+            return;
+
+        if (target.GetComponent<UIAudioClickFeedback>() == null)
+            target.AddComponent<UIAudioClickFeedback>();
     }
 
     private bool IsClickInsideRect(RectTransform rect, Vector2 screenPosition)
@@ -289,43 +592,17 @@ public class UIPanelController : MonoBehaviour
 
     private bool IsClickOnButton(Vector2 screenPosition)
     {
-        if (IsClickOnAnyUIButton(screenPosition))
+        if (IsClickInsideButton(shopButton, screenPosition))
             return true;
 
-        if (IsClickInsideButton(dinoShopButton, screenPosition))
+        if (IsClickInsideButton(foodButton, screenPosition))
             return true;
 
-        if (IsClickInsideButton(foodShopButton, screenPosition))
+        if (IsClickInsideButton(shopCloseButton, screenPosition))
             return true;
 
-        if (IsClickInsideButton(dinoShopCloseButton, screenPosition))
+        if (IsClickInsideButton(foodCloseButton, screenPosition))
             return true;
-
-        if (IsClickInsideButton(foodShopCloseButton, screenPosition))
-            return true;
-
-        return false;
-    }
-
-    private bool IsClickOnAnyUIButton(Vector2 screenPosition)
-    {
-        if (EventSystem.current == null)
-            return false;
-
-        PointerEventData pointerData = new PointerEventData(EventSystem.current);
-        pointerData.position = screenPosition;
-
-        uiRaycastResults.Clear();
-        EventSystem.current.RaycastAll(pointerData, uiRaycastResults);
-
-        foreach (RaycastResult result in uiRaycastResults)
-        {
-            if (result.gameObject == null)
-                continue;
-
-            if (result.gameObject.GetComponentInParent<Button>() != null)
-                return true;
-        }
 
         return false;
     }
@@ -386,5 +663,14 @@ public class UIPanelController : MonoBehaviour
 
         return Input.mousePosition;
 #endif
+    }
+}
+
+public class UIAudioClickFeedback : MonoBehaviour, IPointerDownHandler
+{
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (AudioManager.Instanse != null)
+            AudioManager.Instanse.PlayClick();
     }
 }
