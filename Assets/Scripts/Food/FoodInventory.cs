@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,20 +7,13 @@ public class FoodInventory : MonoBehaviour
 
     [Header("Inventory UI")]
     public Transform foodSlotParent;
-    public FoodSlotUI foodSlotPrefab;
+    public FoodUI foodSlotPrefab;
 
     [Header("Available Food")]
     public List<FoodConfig> availableFoods = new List<FoodConfig>();
 
-    [Header("Buying")]
-    [SerializeField] private int selectedBuyAmount = 1;
-
     private readonly Dictionary<FoodConfig, int> foodAmounts = new Dictionary<FoodConfig, int>();
-    private readonly List<FoodSlotUI> spawnedSlots = new List<FoodSlotUI>();
-
-    public int SelectedBuyAmount => Mathf.Max(1, selectedBuyAmount);
-
-    public event Action<int> SelectedBuyAmountChanged;
+    private readonly List<FoodUI> spawnedSlots = new List<FoodUI>();
 
     private void Awake()
     {
@@ -30,7 +22,7 @@ public class FoodInventory : MonoBehaviour
 
     private void Start()
     {
-        foreach (FoodConfig food in availableFoods)
+        foreach (FoodConfig food in GetConfiguredFoods())
         {
             if (food != null && !foodAmounts.ContainsKey(food))
                 foodAmounts.Add(food, 0);
@@ -85,47 +77,16 @@ public class FoodInventory : MonoBehaviour
         return foodAmounts[food];
     }
 
-    public void BuyFood(FoodConfig food)
-    {
-        BuyFood(food, SelectedBuyAmount);
-    }
-
-    public void BuyFood(FoodConfig food, int amount)
-    {
-        if (food == null)
-            return;
-
-        if (amount <= 0)
-            return;
-
-        if (GameManager.Instance == null)
-            return;
-
-        int totalPrice = food.price * amount;
-
-        if (!GameManager.Instance.SpendCoins(totalPrice))
-            return;
-
-        AddFood(food, amount);
-    }
-
-    public void SetSelectedBuyAmount(int amount)
-    {
-        selectedBuyAmount = Mathf.Max(1, amount);
-        RefreshInventoryUI();
-        SelectedBuyAmountChanged?.Invoke(SelectedBuyAmount);
-    }
-
     private void BuildInventoryUI()
     {
         ClearInventoryUI();
 
-        foreach (FoodConfig food in availableFoods)
+        foreach (FoodConfig food in GetConfiguredFoods())
         {
             if (food == null)
                 continue;
 
-            FoodSlotUI slot = Instantiate(foodSlotPrefab, foodSlotParent);
+            FoodUI slot = Instantiate(foodSlotPrefab, foodSlotParent);
             slot.Init(food);
             spawnedSlots.Add(slot);
         }
@@ -135,7 +96,7 @@ public class FoodInventory : MonoBehaviour
 
     public void RefreshInventoryUI()
     {
-        foreach (FoodSlotUI slot in spawnedSlots)
+        foreach (FoodUI slot in spawnedSlots)
         {
             if (slot != null)
                 slot.Refresh();
@@ -144,7 +105,7 @@ public class FoodInventory : MonoBehaviour
 
     private void ClearInventoryUI()
     {
-        foreach (FoodSlotUI slot in spawnedSlots)
+        foreach (FoodUI slot in spawnedSlots)
         {
             if (slot != null)
                 Destroy(slot.gameObject);
@@ -157,7 +118,7 @@ public class FoodInventory : MonoBehaviour
     {
         List<FoodSaveData> data = new List<FoodSaveData>();
 
-        foreach (FoodConfig food in availableFoods)
+        foreach (FoodConfig food in GetConfiguredFoods())
         {
             if (food == null)
                 continue;
@@ -179,7 +140,7 @@ public class FoodInventory : MonoBehaviour
 
         foodAmounts.Clear();
 
-        foreach (FoodConfig food in availableFoods)
+        foreach (FoodConfig food in GetConfiguredFoods())
         {
             if (food != null && !foodAmounts.ContainsKey(food))
                 foodAmounts.Add(food, 0);
@@ -203,12 +164,23 @@ public class FoodInventory : MonoBehaviour
 
     private FoodConfig GetFoodByName(string foodName)
     {
-        foreach (FoodConfig food in availableFoods)
+        foreach (FoodConfig food in GetConfiguredFoods())
         {
             if (food != null && food.foodName == foodName)
                 return food;
         }
 
         return null;
+    }
+
+    private List<FoodConfig> GetConfiguredFoods()
+    {
+        if (availableFoods != null && availableFoods.Count > 0)
+            return availableFoods;
+
+        if (FoodShop.Instance != null)
+            return FoodShop.Instance.availableFoods;
+
+        return availableFoods;
     }
 }

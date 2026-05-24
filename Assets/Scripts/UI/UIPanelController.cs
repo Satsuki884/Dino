@@ -37,7 +37,6 @@ public class UIPanelController : MonoBehaviour
     private RectTransform currentOpenPanelRect;
 
     private bool ignoreNextOutsideClick;
-    private bool foodPanelHiddenDuringDrag;
     private readonly List<RaycastResult> uiRaycastResults = new List<RaycastResult>();
 
     private void Awake()
@@ -63,6 +62,7 @@ public class UIPanelController : MonoBehaviour
             foodCloseButton.onClick.AddListener(OnCloseButtonClicked);
 
         CloseAllPanels();
+        ShowFoodInventoryPanel();
     }
 
     private void Update()
@@ -105,7 +105,7 @@ public class UIPanelController : MonoBehaviour
     private void OnFoodButtonClicked()
     {
         PlayClick();
-        HandlePanelButtonClick(foodInventoryPanel, foodInventoryPanelRect);
+        ShowFoodInventoryPanel();
     }
 
     private void OnCloseButtonClicked()
@@ -154,30 +154,15 @@ public class UIPanelController : MonoBehaviour
         if (shopPanel != null)
             shopPanel.SetActive(false);
 
-        if (foodInventoryPanel != null)
-            foodInventoryPanel.SetActive(false);
-
         ShowFoodPanelVisuals();
 
         currentOpenPanel = null;
         currentOpenPanelRect = null;
-        foodPanelHiddenDuringDrag = false;
     }
 
     public void CloseFoodPanelOnly()
     {
-        if (foodInventoryPanel != null)
-            foodInventoryPanel.SetActive(false);
-
-        ShowFoodPanelVisuals();
-
-        if (currentOpenPanel == foodInventoryPanel)
-        {
-            currentOpenPanel = null;
-            currentOpenPanelRect = null;
-        }
-
-        foodPanelHiddenDuringDrag = false;
+        ShowFoodInventoryPanel();
     }
 
     public void CloseShopPanelOnly()
@@ -194,35 +179,18 @@ public class UIPanelController : MonoBehaviour
 
     public void HideFoodPanelDuringDrag()
     {
-        if (foodInventoryPanel == null)
-            return;
-
-        if (!foodInventoryPanel.activeSelf)
-            return;
-
-        if (foodInventoryCanvasGroup == null)
-            foodInventoryCanvasGroup = foodInventoryPanel.GetComponent<CanvasGroup>();
-
-        if (foodInventoryCanvasGroup == null)
-        {
-            Debug.LogWarning("FoodInventoryPanel has no CanvasGroup.");
-            return;
-        }
-
-        foodInventoryCanvasGroup.alpha = 0f;
-        foodInventoryCanvasGroup.interactable = false;
-        foodInventoryCanvasGroup.blocksRaycasts = false;
-
-        foodPanelHiddenDuringDrag = true;
+        ShowFoodInventoryPanel();
     }
 
     public void FinishFoodPanelDragClose()
     {
-        if (!foodPanelHiddenDuringDrag)
-            return;
+        ShowFoodInventoryPanel();
+    }
 
+    private void ShowFoodInventoryPanel()
+    {
         if (foodInventoryPanel != null)
-            foodInventoryPanel.SetActive(false);
+            foodInventoryPanel.SetActive(true);
 
         ShowFoodPanelVisuals();
 
@@ -231,8 +199,6 @@ public class UIPanelController : MonoBehaviour
             currentOpenPanel = null;
             currentOpenPanelRect = null;
         }
-
-        foodPanelHiddenDuringDrag = false;
     }
 
     private void ShowFoodPanelVisuals()
@@ -265,7 +231,7 @@ public class UIPanelController : MonoBehaviour
 
     public bool IsFoodPanelOpen()
     {
-        return currentOpenPanel == foodInventoryPanel;
+        return foodInventoryPanel != null && foodInventoryPanel.activeSelf;
     }
 
     public bool IsShopPanelOpen()

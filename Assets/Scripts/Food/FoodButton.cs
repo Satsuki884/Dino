@@ -31,12 +31,12 @@ public class FoodButton : MonoBehaviour
             return;
         }
 
-        if (FoodInventory.Instance == null)
+        if (FoodShop.Instance == null)
         {
-            Debug.LogWarning("FoodInventory not found on scene.");
+            Debug.LogWarning("FoodShop not found on scene.");
             return;
         }
 
-        FoodInventory.Instance.BuyFood(foodConfig);
+        FoodShop.Instance.BuyFood(foodConfig);
     }
 }

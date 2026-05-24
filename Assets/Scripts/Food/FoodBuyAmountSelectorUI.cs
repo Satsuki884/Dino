@@ -21,8 +21,8 @@ public class FoodBuyAmountSelectorUI : MonoBehaviour
 
     private void OnDisable()
     {
-        if (FoodInventory.Instance != null && isSubscribed)
-            FoodInventory.Instance.SelectedBuyAmountChanged -= RefreshSelectedAmount;
+        if (FoodShop.Instance != null && isSubscribed)
+            FoodShop.Instance.SelectedBuyAmountChanged -= RefreshSelectedAmount;
 
         isSubscribed = false;
     }
@@ -43,10 +43,10 @@ public class FoodBuyAmountSelectorUI : MonoBehaviour
         if (isSubscribed)
             return;
 
-        if (FoodInventory.Instance == null)
+        if (FoodShop.Instance == null)
             return;
 
-        FoodInventory.Instance.SelectedBuyAmountChanged += RefreshSelectedAmount;
+        FoodShop.Instance.SelectedBuyAmountChanged += RefreshSelectedAmount;
         isSubscribed = true;
     }
 
@@ -61,8 +61,8 @@ public class FoodBuyAmountSelectorUI : MonoBehaviour
 
     private void SelectNextAmount()
     {
-        int currentAmount = FoodInventory.Instance != null
-            ? FoodInventory.Instance.SelectedBuyAmount
+        int currentAmount = FoodShop.Instance != null
+            ? FoodShop.Instance.SelectedBuyAmount
             : 1;
 
         SelectAmount(GetNextAmount(currentAmount));
@@ -81,16 +81,16 @@ public class FoodBuyAmountSelectorUI : MonoBehaviour
 
     private void SelectAmount(int amount)
     {
-        if (FoodInventory.Instance != null)
-            FoodInventory.Instance.SetSelectedBuyAmount(amount);
+        if (FoodShop.Instance != null)
+            FoodShop.Instance.SetSelectedBuyAmount(amount);
 
         RefreshSelectedAmount(amount);
     }
 
     private void RefreshFromInventory()
     {
-        int amount = FoodInventory.Instance != null
-            ? FoodInventory.Instance.SelectedBuyAmount
+        int amount = FoodShop.Instance != null
+            ? FoodShop.Instance.SelectedBuyAmount
             : 1;
 
         RefreshSelectedAmount(amount);
