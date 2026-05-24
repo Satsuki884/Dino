@@ -205,6 +205,26 @@ public class DraggableFoodUI : MonoBehaviour,
             return;
         }
 
+        if (!FoodInventory.Instance.HasFood(foodConfig))
+        {
+            if (showDebugLogs)
+                Debug.LogWarning("No food left in inventory: " + foodConfig.foodName);
+
+            FoodInventory.Instance.RefreshInventoryUI();
+            return;
+        }
+
+        bool caloriesIncreased = targetDino.Feed(foodConfig);
+
+        if (!caloriesIncreased)
+        {
+            if (showDebugLogs)
+                Debug.Log("Dino was not fed. Calories did not increase.");
+
+            FoodInventory.Instance.RefreshInventoryUI();
+            return;
+        }
+
         bool foodWasUsed = FoodInventory.Instance.UseFood(foodConfig);
 
         if (!foodWasUsed)
@@ -216,7 +236,8 @@ public class DraggableFoodUI : MonoBehaviour,
             return;
         }
 
-        targetDino.Feed(foodConfig);
+        if (AudioManager.Instanse != null)
+            AudioManager.Instanse.PlayFeedDino();
 
         if (showDebugLogs)
         {

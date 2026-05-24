@@ -30,6 +30,9 @@ public class SpawnedCoin : MonoBehaviour
         if (valueText != null)
             valueText.text = FormatNumber(value);
 
+        if (AudioManager.Instanse != null)
+            AudioManager.Instanse.PlayDropCoin();
+
         Destroy(gameObject, lifeTime);
     }
 
@@ -113,6 +116,9 @@ public class SpawnedCoin : MonoBehaviour
 
         if (GameManager.Instance != null)
             GameManager.Instance.AddCoins(value);
+
+        if (AudioManager.Instanse != null)
+            AudioManager.Instanse.PlayPickUpCoin();
 
         Destroy(gameObject);
     }
