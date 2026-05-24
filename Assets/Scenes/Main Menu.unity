@@ -530,7 +530,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &179282000
 RectTransform:
   m_ObjectHideFlags: 0
@@ -650,7 +650,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &294760652
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1242,7 +1242,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &801588730
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1414,7 +1414,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "Developers: Satsuki_884 and Yad_Energy\n2d artists: senko and \n\nSound
-    Designer: Wolfhant"
+    Designer: Wolfnhant"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3c3de5d2726e34a42a62d531f5198e51, type: 2}
   m_sharedMaterial: {fileID: -7765549827294149658, guid: 3c3de5d2726e34a42a62d531f5198e51, type: 2}
@@ -2125,10 +2125,10 @@ RectTransform:
   - {fileID: 2103480526}
   m_Father: {fileID: 2146350501}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.25, y: 0.09017391}
-  m_AnchorMax: {x: 0.7455401, y: 0.20600002}
-  m_AnchoredPosition: {x: 1.4999695, y: -4}
-  m_SizeDelta: {x: -3, y: 4}
+  m_AnchorMin: {x: 0.25, y: 0.25414124}
+  m_AnchorMax: {x: 0.7455401, y: 0.3673045}
+  m_AnchoredPosition: {x: 1.4999695, y: -3}
+  m_SizeDelta: {x: -3, y: 6}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1500199168
 MonoBehaviour:
@@ -2831,7 +2831,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 71.4
+  m_fontSize: 71.25
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

@@ -11,14 +11,14 @@ public class MainMenuController : MonoBehaviour
 
     [Header("Panels")]
     public GameObject mainMenuPanel;
-    public GameObject optionsPanel;
+    // public GameObject optionsPanel;
     public GameObject authorsPanel;
 
     [Header("Buttons")]
     public Button PlayBut;
     public Button NewGameBut;
     public Button AuthorsBut;
-    public Button OptionBut;
+    // public Button OptionBut;
 
     public Button closeOptionsButton;
     public Button closeAuthorsButton;
@@ -48,11 +48,11 @@ public class MainMenuController : MonoBehaviour
         RefreshNewGameButton();
     }
 
-    public void ShowOptions()
-    {
-        PlayClick();
-        ShowPanel(optionsPanel);
-    }
+    // public void ShowOptions()
+    // {
+    //     PlayClick();
+    //     ShowPanel(optionsPanel);
+    // }
 
     public void ShowAuthors()
     {
@@ -79,11 +79,11 @@ public class MainMenuController : MonoBehaviour
             NewGameBut.onClick.AddListener(NewGame);
         }
 
-        if (OptionBut != null)
-        {
-            OptionBut.onClick.RemoveListener(ShowOptions);
-            OptionBut.onClick.AddListener(ShowOptions);
-        }
+        // if (OptionBut != null)
+        // {
+        //     OptionBut.onClick.RemoveListener(ShowOptions);
+        //     OptionBut.onClick.AddListener(ShowOptions);
+        // }
 
         if (AuthorsBut != null)
         {
@@ -138,8 +138,8 @@ public class MainMenuController : MonoBehaviour
         if (mainMenuPanel != null)
             mainMenuPanel.SetActive(panelToShow == mainMenuPanel);
 
-        if (optionsPanel != null)
-            optionsPanel.SetActive(panelToShow == optionsPanel);
+        // if (optionsPanel != null)
+        //     optionsPanel.SetActive(panelToShow == optionsPanel);
 
         if (authorsPanel != null)
             authorsPanel.SetActive(panelToShow == authorsPanel);
@@ -150,8 +150,8 @@ public class MainMenuController : MonoBehaviour
         if (mainMenuPanel == null)
             mainMenuPanel = FindSceneObject("MainMenu_panel");
 
-        if (optionsPanel == null)
-            optionsPanel = FindSceneObject("Options_panel");
+        // if (optionsPanel == null)
+        //     optionsPanel = FindSceneObject("Options_panel");
 
         if (authorsPanel == null)
             authorsPanel = FindSceneObject("Authors_panel");
@@ -162,8 +162,8 @@ public class MainMenuController : MonoBehaviour
         if (NewGameBut == null)
             NewGameBut = FindButton("New_game_but");
 
-        if (OptionBut == null)
-            OptionBut = FindButton("options_but");
+        // if (OptionBut == null)
+        //     OptionBut = FindButton("options_but");
 
         if (AuthorsBut == null)
             AuthorsBut = FindButton("Authors_but");
