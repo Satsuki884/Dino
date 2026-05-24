@@ -15,7 +15,7 @@ MonoBehaviour:
   level: 1
   dinoName: Picklesaurus
   buyPrice: 10
-  startCalories: 30
+  startCalories: 40
   moveSpeed: 1
   growthTimeMultiplier: 2
   coinPerRaid: 76

@@ -15,7 +15,7 @@ MonoBehaviour:
   level: 4
   dinoName: Triceratonio
   buyPrice: 2880
-  startCalories: 1600
+  startCalories: 1610
   moveSpeed: 0.7
   growthTimeMultiplier: 2
   coinPerRaid: 5684
@@ -28,21 +28,21 @@ MonoBehaviour:
     caloriesConsumePerTick: 64
     coinsPerTick: 1
     canMove: 0
-    spawnedCoinIntervalMin: 5
-    spawnedCoinIntervalMax: 10
+    spawnedCoinIntervalMin: 1000
+    spawnedCoinIntervalMax: 3000
   - stageName: Baby
     sprite: {fileID: -6960910802043165949, guid: 7238037441c955544991ada7416d21c1, type: 3}
     ticksToNextStage: 45
     caloriesConsumePerTick: 42
     coinsPerTick: 17
     canMove: 1
-    spawnedCoinIntervalMin: 5
-    spawnedCoinIntervalMax: 10
+    spawnedCoinIntervalMin: 1000
+    spawnedCoinIntervalMax: 3000
   - stageName: Dino
     sprite: {fileID: 3945032398801038256, guid: c25815b421731094d8d4d7279224028a, type: 3}
     ticksToNextStage: 0
     caloriesConsumePerTick: 32
     coinsPerTick: 50
     canMove: 1
-    spawnedCoinIntervalMin: 5
-    spawnedCoinIntervalMax: 10
+    spawnedCoinIntervalMin: 1000
+    spawnedCoinIntervalMax: 3000

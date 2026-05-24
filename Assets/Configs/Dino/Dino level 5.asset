@@ -15,7 +15,7 @@ MonoBehaviour:
   level: 5
   dinoName: SpecialD
   buyPrice: 10200
-  startCalories: 5040
+  startCalories: 5050
   moveSpeed: 1.3
   growthTimeMultiplier: 2
   coinPerRaid: 25400
@@ -28,21 +28,21 @@ MonoBehaviour:
     caloriesConsumePerTick: 144
     coinsPerTick: 2
     canMove: 0
-    spawnedCoinIntervalMin: 5
-    spawnedCoinIntervalMax: 10
+    spawnedCoinIntervalMin: 7000
+    spawnedCoinIntervalMax: 11000
   - stageName: Baby
     sprite: {fileID: 3804081581971136423, guid: fdf379a837d6d0241a1c82b880f103d1, type: 3}
     ticksToNextStage: 60
     caloriesConsumePerTick: 128
     coinsPerTick: 100
     canMove: 1
-    spawnedCoinIntervalMin: 5
-    spawnedCoinIntervalMax: 10
+    spawnedCoinIntervalMin: 7000
+    spawnedCoinIntervalMax: 11000
   - stageName: Dino
     sprite: {fileID: 2912313005811943162, guid: 771e0247b13464449bd3a18c7ec65225, type: 3}
     ticksToNextStage: 0
     caloriesConsumePerTick: 100
     coinsPerTick: 250
     canMove: 1
-    spawnedCoinIntervalMin: 5
-    spawnedCoinIntervalMax: 10
+    spawnedCoinIntervalMin: 7000
+    spawnedCoinIntervalMax: 11000

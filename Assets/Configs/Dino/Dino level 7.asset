@@ -15,7 +15,7 @@ MonoBehaviour:
   level: 7
   dinoName: Ancient Horror
   buyPrice: 384600
-  startCalories: 2550
+  startCalories: 20500
   moveSpeed: 0.9
   growthTimeMultiplier: 2
   coinPerRaid: 1310450
@@ -28,21 +28,21 @@ MonoBehaviour:
     caloriesConsumePerTick: 320
     coinsPerTick: 15
     canMove: 0
-    spawnedCoinIntervalMin: 5
-    spawnedCoinIntervalMax: 10
+    spawnedCoinIntervalMin: 300000
+    spawnedCoinIntervalMax: 400000
   - stageName: Baby
     sprite: {fileID: -3866946262359525832, guid: 3362dab8f315d0f4fb035740d18b65d3, type: 3}
     ticksToNextStage: 120
     caloriesConsumePerTick: 300
     coinsPerTick: 1500
     canMove: 1
-    spawnedCoinIntervalMin: 5
-    spawnedCoinIntervalMax: 10
+    spawnedCoinIntervalMin: 300000
+    spawnedCoinIntervalMax: 400000
   - stageName: Dino
     sprite: {fileID: -3072019042627757946, guid: 1ab2ebce05dd53641a15ebd38faf6d94, type: 3}
     ticksToNextStage: 0
     caloriesConsumePerTick: 284
     coinsPerTick: 4000
     canMove: 1
-    spawnedCoinIntervalMin: 5
-    spawnedCoinIntervalMax: 10
+    spawnedCoinIntervalMin: 30000
+    spawnedCoinIntervalMax: 30000
