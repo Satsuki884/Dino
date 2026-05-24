@@ -49,12 +49,16 @@ public class FoodSlotUIShop : MonoBehaviour
         bool unlocked = FoodShop.Instance != null &&
                         FoodShop.Instance.IsFoodUnlocked(foodConfig);
 
-        if (amountText != null)
-            amountText.text = "";
-
         int buyAmount = FoodShop.Instance != null
             ? FoodShop.Instance.SelectedBuyAmount
             : 1;
+
+        int currentAmount = FoodInventory.Instance != null
+            ? FoodInventory.Instance.GetFoodAmount(foodConfig)
+            : 0;
+
+        if (amountText != null)
+            amountText.text = unlocked ? CoinFormatter.FormatNumber(currentAmount) : "";
 
         if (priceText != null)
             priceText.text = unlocked ? CoinFormatter.FormatNumber(foodConfig.price * buyAmount) : "";

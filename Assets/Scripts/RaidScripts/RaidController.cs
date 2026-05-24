@@ -144,7 +144,7 @@ public class RaidController : MonoBehaviour
             confirmPopup.SetActive(true);
 
         if (confirmText != null)
-            confirmText.text = "Вы точно хотите вернуть динозавра?\nНаграда за рейд не будет получена.";
+            confirmText.text = "Are you sure you want to return the dinosaur?\nNo reward will be received for this raid.";
     }
 
     private void ConfirmReturnDino()
