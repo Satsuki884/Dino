@@ -31,7 +31,7 @@ public class ShopItemUI : MonoBehaviour
         if (config == null)
             return;
 
-        bool unlocked = GameManager.Instance.IsLevelUnlocked(config.level);
+        bool unlocked = GameManager.Instance.IsDinoEggUnlockedInShop(config.level);
         bool hasSpace = GameManager.Instance.CanSpawnMoreDinos();
 
         if (nameText != null)

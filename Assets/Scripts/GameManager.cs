@@ -134,7 +134,7 @@ public class GameManager : MonoBehaviour
         if (config == null)
             return;
 
-        if (level > highestUnlockedLevel)
+        if (!IsDinoEggUnlockedInShop(level))
             return;
 
         if (!SpendCoins(config.buyPrice))
@@ -248,6 +248,22 @@ public class GameManager : MonoBehaviour
     public bool IsLevelUnlocked(int level)
     {
         return level <= highestUnlockedLevel;
+    }
+
+    public bool IsDinoEggUnlockedInShop(int eggLevel)
+    {
+        if (eggLevel <= 1)
+            return true;
+
+        return highestUnlockedLevel >= GetRequiredDinoLevelForShopEgg(eggLevel);
+    }
+
+    public int GetRequiredDinoLevelForShopEgg(int eggLevel)
+    {
+        if (eggLevel <= 1)
+            return 1;
+
+        return eggLevel + 2;
     }
 
     public DinoConfig GetConfigByLevel(int level)
