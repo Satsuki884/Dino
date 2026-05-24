@@ -86,8 +86,7 @@ public class GameManager : MonoBehaviour
             shopManager.RefreshShop();
         }
 
-        if (FoodInventory.Instance != null)
-            FoodInventory.Instance.RefreshInventoryUI();
+        RefreshFoodUI();
     }
 
     private void Update()
@@ -113,6 +112,7 @@ public class GameManager : MonoBehaviour
         coinRemainder -= wholeCoins;
 
         UpdateUI();
+        RefreshFoodUI();
     }
 
     public bool SpendCoins(int amount)
@@ -122,7 +122,17 @@ public class GameManager : MonoBehaviour
 
         coins -= amount;
         UpdateUI();
+        RefreshFoodUI();
         return true;
+    }
+
+    private void RefreshFoodUI()
+    {
+        if (FoodShop.Instance != null)
+            FoodShop.Instance.RefreshShopUI();
+
+        if (FoodInventory.Instance != null)
+            FoodInventory.Instance.RefreshInventoryUI();
     }
 
     public bool CanSpawnMoreDinos()
@@ -244,8 +254,7 @@ public class GameManager : MonoBehaviour
             if (shopManager != null)
                 shopManager.RefreshShop();
 
-            if (FoodInventory.Instance != null)
-                FoodInventory.Instance.RefreshInventoryUI();
+            RefreshFoodUI();
         }
     }
 
@@ -401,6 +410,9 @@ public class GameManager : MonoBehaviour
         data.highestUnlockedLevel = highestUnlockedLevel;
         data.dinoEggPrices = GetDinoEggPriceSaveData();
 
+        if (FoodShop.Instance != null)
+            data.selectedFoodBuyAmount = FoodShop.Instance.SelectedBuyAmount;
+
         foreach (Dino dino in activeDinos)
         {
             if (dino == null)
@@ -505,6 +517,9 @@ public class GameManager : MonoBehaviour
 
         if (activeDinos.Count == 0)
             SpawnDino(1, 1, GetRandomPointInField());
+
+        if (FoodShop.Instance != null)
+            FoodShop.Instance.SetSelectedBuyAmount(data.selectedFoodBuyAmount);
 
         if (FoodInventory.Instance != null)
             FoodInventory.Instance.LoadFromSave(data.foods);

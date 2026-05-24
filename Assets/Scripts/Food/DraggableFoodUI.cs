@@ -16,7 +16,6 @@ public class DraggableFoodUI : MonoBehaviour,
 
     [Header("Settings")]
     public bool disableScrollWhileDragging = true;
-    public bool closeInventoryWhenDraggedOutside = true;
     public bool showDebugLogs = true;
 
     [Header("Dino Detection")]
@@ -29,7 +28,6 @@ public class DraggableFoodUI : MonoBehaviour,
 
     private bool isAvailable;
     private bool isDragging;
-    private bool inventoryWasHidden;
 
     private void Awake()
     {
@@ -98,8 +96,6 @@ public class DraggableFoodUI : MonoBehaviour,
 
         isDragging = true;
         IsDraggingFood = true;
-        inventoryWasHidden = false;
-
         if (disableScrollWhileDragging && parentScrollRect != null)
             parentScrollRect.enabled = false;
 
@@ -123,8 +119,6 @@ public class DraggableFoodUI : MonoBehaviour,
         if (currentDragIcon != null)
             currentDragIcon.transform.position = eventData.position;
 
-        if (closeInventoryWhenDraggedOutside)
-            TryHideInventoryIfDraggedOutside(eventData.position);
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -143,12 +137,8 @@ public class DraggableFoodUI : MonoBehaviour,
         if (disableScrollWhileDragging && parentScrollRect != null)
             parentScrollRect.enabled = true;
 
-        if (UIPanelController.Instance != null)
-            UIPanelController.Instance.FinishFoodPanelDragClose();
-
         isDragging = false;
         IsDraggingFood = false;
-        inventoryWasHidden = false;
     }
 
     private bool CanDrag()
@@ -205,26 +195,6 @@ public class DraggableFoodUI : MonoBehaviour,
             return;
         }
 
-        if (!FoodInventory.Instance.HasFood(foodConfig))
-        {
-            if (showDebugLogs)
-                Debug.LogWarning("No food left in inventory: " + foodConfig.foodName);
-
-            FoodInventory.Instance.RefreshInventoryUI();
-            return;
-        }
-
-        bool caloriesIncreased = targetDino.Feed(foodConfig);
-
-        if (!caloriesIncreased)
-        {
-            if (showDebugLogs)
-                Debug.Log("Dino was not fed. Calories did not increase.");
-
-            FoodInventory.Instance.RefreshInventoryUI();
-            return;
-        }
-
         bool foodWasUsed = FoodInventory.Instance.UseFood(foodConfig);
 
         if (!foodWasUsed)
@@ -236,8 +206,7 @@ public class DraggableFoodUI : MonoBehaviour,
             return;
         }
 
-        if (AudioManager.Instanse != null)
-            AudioManager.Instanse.PlayFeedDino();
+        targetDino.Feed(foodConfig);
 
         if (showDebugLogs)
         {
@@ -271,29 +240,4 @@ public class DraggableFoodUI : MonoBehaviour,
         return null;
     }
 
-    private void TryHideInventoryIfDraggedOutside(Vector2 screenPosition)
-    {
-        if (inventoryWasHidden)
-            return;
-
-        if (UIPanelController.Instance == null)
-            return;
-
-        RectTransform foodPanelRect = UIPanelController.Instance.GetFoodPanelRect();
-
-        if (foodPanelRect == null)
-            return;
-
-        bool insideInventory = RectTransformUtility.RectangleContainsScreenPoint(
-            foodPanelRect,
-            screenPosition,
-            null
-        );
-
-        if (insideInventory)
-            return;
-
-        UIPanelController.Instance.HideFoodPanelDuringDrag();
-        inventoryWasHidden = true;
-    }
 }

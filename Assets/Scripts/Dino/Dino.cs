@@ -11,10 +11,16 @@ public class Dino : MonoBehaviour
     public float walkTiltAngle = 6f;
     public float walkTiltSpeed = 6f;
 
+    [Header("Hungry Movement")]
+    [Range(0f, 1f)] public float hungryMoveSpeedMultiplier = 0.25f;
+    [Range(0f, 1f)] public float hungryWalkTiltAngleMultiplier = 0.25f;
+    [Range(0f, 1f)] public float hungryWalkTiltSpeedMultiplier = 0.25f;
+
     [Header("UI Above Head")]
     public Slider caloriesSlider;
     public Slider growthSlider;
     public TMP_Text levelText;
+    public GameObject raidReadyIcon;
 
     [Header("Runtime Info")]
     [SerializeField] private DinoConfig config;
@@ -311,7 +317,7 @@ public class Dino : MonoBehaviour
         if (GameManager.Instance == null)
             return;
 
-        transform.position += (Vector3)(moveDirection * config.moveSpeed * Time.deltaTime);
+        transform.position += (Vector3)(moveDirection * GetCurrentMoveSpeed() * Time.deltaTime);
 
         Bounds bounds = GameManager.Instance.GetFieldBounds();
         Vector3 position = transform.position;
@@ -359,13 +365,39 @@ public class Dino : MonoBehaviour
         spriteRenderer.flipX = spriteFacesLeftByDefault ? movingRight : !movingRight;
     }
 
+    private float GetCurrentMoveSpeed()
+    {
+        float speed = config != null ? config.moveSpeed : 0f;
+
+        if (!HasCalories())
+            speed *= hungryMoveSpeedMultiplier;
+
+        return speed;
+    }
+
     private void UpdateWalkAnimation()
     {
         if (spriteRenderer == null)
             return;
 
-        float tilt = Mathf.Sin(Time.time * walkTiltSpeed) * walkTiltAngle;
+        float tilt = Mathf.Sin(Time.time * GetCurrentWalkTiltSpeed()) * GetCurrentWalkTiltAngle();
         spriteRenderer.transform.localRotation = spriteStartRotation * Quaternion.Euler(0f, 0f, tilt);
+    }
+
+    private float GetCurrentWalkTiltAngle()
+    {
+        if (!HasCalories())
+            return walkTiltAngle * hungryWalkTiltAngleMultiplier;
+
+        return walkTiltAngle;
+    }
+
+    private float GetCurrentWalkTiltSpeed()
+    {
+        if (!HasCalories())
+            return walkTiltSpeed * hungryWalkTiltSpeedMultiplier;
+
+        return walkTiltSpeed;
     }
 
     private void ResetWalkAnimation()
@@ -458,6 +490,7 @@ public class Dino : MonoBehaviour
         UpdateCaloriesUI();
         UpdateGrowthUI();
         UpdateLevelText();
+        UpdateRaidReadyIcon();
     }
 
     private void UpdateCaloriesUI()
@@ -614,12 +647,17 @@ public class Dino : MonoBehaviour
         if (isInRaid)
             return false;
 
-        if (Stage <= 1)
+        if (Stage <= 2)
+            return false;
+
+        if (config == null)
+            return false;
+
+        if (calories < config.minCaloriesForRaid)
             return false;
 
         return true;
     }
-
     public float GetRaidReward()
     {
         if (config == null)
@@ -654,6 +692,14 @@ public class Dino : MonoBehaviour
 
         UpdateVisual();
         UpdateUI();
+    }
+
+    private void UpdateRaidReadyIcon()
+    {
+        if (raidReadyIcon == null)
+            return;
+
+        raidReadyIcon.SetActive(CanGoToRaid());
     }
 
 }

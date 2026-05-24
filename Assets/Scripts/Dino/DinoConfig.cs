@@ -22,6 +22,7 @@ public class DinoConfig : ScriptableObject
     [Header("Raid")]
     public float coinPerRaid = 1f;
     public float timeToRaid = 10f;
+    public float minCaloriesForRaid = 10f;
 
     [Header("Stages")]
     public DinoStageData[] stages;
