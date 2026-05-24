@@ -2,14 +2,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class FoodSlotUI : MonoBehaviour
+public class FoodSlotUIShop : MonoBehaviour
 {
     [Header("UI")]
     public Image iconImage;
     public TMP_Text amountText;
     public TMP_Text priceText;
     public Button buyButton;
-    public DraggableFoodUI draggableFood;
 
     [Header("Locked View")]
     public Image silhouetteImage;
@@ -39,9 +38,6 @@ public class FoodSlotUI : MonoBehaviour
             buyButton.onClick.AddListener(BuyFood);
         }
 
-        if (draggableFood != null)
-            draggableFood.Init(foodConfig);
-
         Refresh();
     }
 
@@ -50,26 +46,24 @@ public class FoodSlotUI : MonoBehaviour
         if (foodConfig == null)
             return;
 
-        bool unlocked = FoodInventory.Instance != null &&
-                        FoodInventory.Instance.IsFoodUnlocked(foodConfig);
-
-        int amount = FoodInventory.Instance != null
-            ? FoodInventory.Instance.GetFoodAmount(foodConfig)
-            : 0;
-
-        bool hasFood = amount > 0;
+        bool unlocked = FoodShop.Instance != null &&
+                        FoodShop.Instance.IsFoodUnlocked(foodConfig);
 
         if (amountText != null)
-            amountText.text = unlocked ? amount.ToString() : "";
+            amountText.text = "";
+
+        int buyAmount = FoodShop.Instance != null
+            ? FoodShop.Instance.SelectedBuyAmount
+            : 1;
 
         if (priceText != null)
-            priceText.text = unlocked ? CoinFormatter.FormatNumber(foodConfig.price) : "";
+            priceText.text = unlocked ? CoinFormatter.FormatNumber(foodConfig.price * buyAmount) : "";
 
         if (iconImage != null)
         {
             iconImage.sprite = foodConfig.icon;
             iconImage.color = unlocked
-                ? (hasFood ? Color.white : new Color(1f, 1f, 1f, 0.35f))
+                ? Color.white
                 : Color.black;
         }
 
@@ -86,11 +80,26 @@ public class FoodSlotUI : MonoBehaviour
             lockedText.text = "";
         }
 
-        if (buyButton != null)
-            buyButton.interactable = unlocked;
+        RefreshBuyButton(buyButton, unlocked, buyAmount);
+    }
 
-        if (draggableFood != null)
-            draggableFood.SetAvailable(unlocked && hasFood);
+    private void RefreshBuyButton(Button button, bool unlocked, int amount)
+    {
+        if (button == null)
+            return;
+
+        button.interactable = unlocked && CanBuyAmount(amount);
+    }
+
+    private bool CanBuyAmount(int amount)
+    {
+        if (foodConfig == null)
+            return false;
+
+        if (GameManager.Instance == null)
+            return false;
+
+        return GameManager.Instance.coins >= foodConfig.price * amount;
     }
 
     private void BuyFood()
@@ -98,9 +107,9 @@ public class FoodSlotUI : MonoBehaviour
         if (foodConfig == null)
             return;
 
-        if (FoodInventory.Instance == null)
+        if (FoodShop.Instance == null)
             return;
 
-        FoodInventory.Instance.BuyFood(foodConfig);
+        FoodShop.Instance.BuyFood(foodConfig);
     }
 }

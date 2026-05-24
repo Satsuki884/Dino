@@ -701,6 +701,9 @@ MonoBehaviour:
   spriteFacesLeftByDefault: 1
   walkTiltAngle: 12
   walkTiltSpeed: 12
+  hungryMoveSpeedMultiplier: 0.125
+  hungryWalkTiltAngleMultiplier: 0.5
+  hungryWalkTiltSpeedMultiplier: 0.25
   caloriesSlider: {fileID: 591587110031997898}
   growthSlider: {fileID: 6008891838706819883}
   levelText: {fileID: 5420667931163496435}
