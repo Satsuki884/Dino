@@ -49,7 +49,7 @@ MonoBehaviour:
   audioSource: {fileID: 8305252399744553135}
   SFXSource: {fileID: 1900110910848882237}
   audioMixer: {fileID: 24100000, guid: 916702054fbd61e469eb32f8cd6d072c, type: 2}
-  background: {fileID: 8300000, guid: 266f12a3c83070d418e0930506b7292c, type: 3}
+  background: {fileID: 8300000, guid: c5fa8c1d092e2854890b988a6c7d87e3, type: 3}
   klick: {fileID: 8300000, guid: acd1b0011bcdea844b28ef61213b3c99, type: 3}
   drop_coin: {fileID: 8300000, guid: 4d3195962b33305408faec01851514ad, type: 3}
   deploy_item: {fileID: 8300000, guid: 113dbf7be35021c45a6108b046197afe, type: 3}
