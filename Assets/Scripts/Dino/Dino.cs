@@ -18,9 +18,16 @@ public class Dino : MonoBehaviour
     [SerializeField] private float calories;
     [SerializeField] private float growthTicks;
 
+    [Header("Dropped Coins")]
+    public Vector2 droppedCoinRandomOffset = new Vector2(0.7f, 0.5f);
+
+    private float droppedCoinTimer;
+    private float nextDroppedCoinTime;
+
     private Vector2 moveDirection;
     private bool isDragging;
     private float tickTimer;
+    private bool isInRaid;
 
     public int Level => config != null ? config.level : 0;
     public int Stage => currentStage;
@@ -45,12 +52,25 @@ public class Dino : MonoBehaviour
         if (config == null)
             return;
 
-        if (!isDragging)
+        if (isInRaid)
+            return;
+
+        if (!isDragging && CanMoveByStage())
             Move();
 
         HandleTick();
+        HandleDroppedCoinSpawn();
 
         UpdateUI();
+    }
+    private bool CanMoveByStage()
+    {
+        DinoStageData stageData = CurrentStageData;
+
+        if (stageData == null)
+            return false;
+
+        return stageData.canMove;
     }
 
     public void Init(DinoConfig newConfig, int startStage)
@@ -67,8 +87,79 @@ public class Dino : MonoBehaviour
         if (moveDirection == Vector2.zero)
             moveDirection = Vector2.right;
 
+        ScheduleNextDroppedCoin();
         UpdateVisual();
         UpdateUI();
+    }
+
+    private void ScheduleNextDroppedCoin()
+    {
+        DinoStageData stageData = CurrentStageData;
+
+        if (stageData == null)
+        {
+            nextDroppedCoinTime = 5f;
+            droppedCoinTimer = 0f;
+            return;
+        }
+
+        float min = Mathf.Max(0.5f, stageData.spawnedCoinIntervalMin);
+        float max = Mathf.Max(min, stageData.spawnedCoinIntervalMax);
+
+        nextDroppedCoinTime = Random.Range(min, max);
+        droppedCoinTimer = 0f;
+    }
+
+    private void HandleDroppedCoinSpawn()
+    {
+        if (!HasCalories())
+            return;
+
+        DinoStageData stageData = CurrentStageData;
+
+        if (stageData == null)
+            return;
+
+        droppedCoinTimer += Time.deltaTime;
+
+        if (droppedCoinTimer < nextDroppedCoinTime)
+            return;
+
+        droppedCoinTimer = 0f;
+
+        TrySpawnDroppedCoin(stageData);
+        ScheduleNextDroppedCoin();
+    }
+
+    private void TrySpawnDroppedCoin(DinoStageData stageData)
+    {
+        if (GameManager.Instance == null)
+            return;
+
+        int maxCoinValue = Mathf.FloorToInt(stageData.coinsPerTick);
+
+        if (maxCoinValue <= 0)
+            return;
+
+        int coinValue = Random.Range(0, maxCoinValue + 1);
+
+        if (coinValue <= 0)
+            return;
+
+        Vector3 offset = new Vector3(
+            Random.Range(-droppedCoinRandomOffset.x, droppedCoinRandomOffset.x),
+            Random.Range(-droppedCoinRandomOffset.y, droppedCoinRandomOffset.y),
+            0f
+        );
+
+        Vector3 spawnPosition = transform.position + offset;
+
+        GameManager.Instance.SpawnDroppedCoin(spawnPosition, coinValue);
+    }
+
+    private bool HasCalories()
+    {
+        return calories > 0f;
     }
 
     public void SetDragging(bool value)
@@ -152,6 +243,9 @@ public class Dino : MonoBehaviour
 
     public bool Feed(FoodConfig food)
     {
+        if (isInRaid)
+            return false;
+
         if (food == null)
             return false;
 
@@ -240,6 +334,9 @@ public class Dino : MonoBehaviour
             return false;
 
         if (other == this)
+            return false;
+
+        if (isInRaid || other.IsInRaid())
             return false;
 
         if (Level != other.Level)
@@ -379,4 +476,129 @@ public class Dino : MonoBehaviour
 
         return GameManager.Instance.IsMaxDinoLevel(Level);
     }
+
+    public bool IsInRaid()
+    {
+        return isInRaid;
+    }
+
+    public void StartRaidMode()
+    {
+        isInRaid = true;
+        isDragging = false;
+
+        gameObject.SetActive(false);
+    }
+
+    public void EndRaidMode(Vector3 returnPosition)
+    {
+        transform.position = returnPosition;
+
+        calories = 0f;
+
+        gameObject.SetActive(true);
+
+        isInRaid = false;
+
+        UpdateVisual();
+        UpdateUI();
+    }
+
+    public Sprite GetCurrentSprite()
+    {
+        if (spriteRenderer != null && spriteRenderer.sprite != null)
+            return spriteRenderer.sprite;
+
+        DinoStageData stageData = CurrentStageData;
+
+        if (stageData == null)
+            return null;
+
+        return stageData.sprite;
+    }
+
+    public DinoSaveData GetSaveData()
+    {
+        DinoSaveData data = new DinoSaveData();
+
+        data.level = Level;
+        data.stage = Stage;
+
+        data.positionX = transform.position.x;
+        data.positionY = transform.position.y;
+        data.positionZ = transform.position.z;
+
+        data.calories = calories;
+        data.growthTicks = growthTicks;
+
+        return data;
+    }
+
+    public void LoadFromSave(DinoConfig savedConfig, DinoSaveData data)
+    {
+        if (savedConfig == null || data == null)
+            return;
+
+        Init(savedConfig, data.stage);
+
+        calories = data.calories;
+        growthTicks = data.growthTicks;
+
+        transform.position = new Vector3(
+            data.positionX,
+            data.positionY,
+            data.positionZ
+        );
+
+        UpdateVisual();
+        UpdateUI();
+    }
+
+    public bool CanGoToRaid()
+    {
+        if (isInRaid)
+            return false;
+
+        if (Stage <= 1)
+            return false;
+
+        return true;
+    }
+
+    public float GetRaidReward()
+    {
+        if (config == null)
+            return 0f;
+
+        return config.coinPerRaid;
+    }
+
+    public float GetRaidDuration()
+    {
+        if (config == null)
+            return 10f;
+
+        return Mathf.Max(1f, config.timeToRaid);
+    }
+
+    public float GetCalories()
+    {
+        return calories;
+    }
+
+    public float GetGrowthTicks()
+    {
+        return growthTicks;
+    }
+
+    public void LoadRuntimeState(int loadedStage, float loadedCalories, float loadedGrowthTicks)
+    {
+        currentStage = Mathf.Max(1, loadedStage);
+        calories = Mathf.Max(0f, loadedCalories);
+        growthTicks = Mathf.Max(0f, loadedGrowthTicks);
+
+        UpdateVisual();
+        UpdateUI();
+    }
+
 }

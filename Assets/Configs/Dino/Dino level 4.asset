@@ -17,19 +17,23 @@ MonoBehaviour:
   buyPrice: 125
   startCalories: 1500
   moveSpeed: 1.2
+  growthTimeMultiplier: 2
   stages:
   - stageName: Stage 1
-    sprite: {fileID: -974494812864979246, guid: 675d8366b95a4f146adfc24a6df8ea76, type: 3}
+    sprite: {fileID: 3512306599696331270, guid: 36c76571ac5d9f940ae85ba4145e4827, type: 3}
     ticksToNextStage: 25
     caloriesConsumePerTick: 24
     coinsPerTick: 1
+    canMove: 0
   - stageName: Stage 2
-    sprite: {fileID: -974494812864979246, guid: 675d8366b95a4f146adfc24a6df8ea76, type: 3}
+    sprite: {fileID: 3512306599696331270, guid: 36c76571ac5d9f940ae85ba4145e4827, type: 3}
     ticksToNextStage: 45
     caloriesConsumePerTick: 20
     coinsPerTick: 17
+    canMove: 1
   - stageName: Stage 3
-    sprite: {fileID: -974494812864979246, guid: 675d8366b95a4f146adfc24a6df8ea76, type: 3}
+    sprite: {fileID: 3512306599696331270, guid: 36c76571ac5d9f940ae85ba4145e4827, type: 3}
     ticksToNextStage: 0
     caloriesConsumePerTick: 16
     coinsPerTick: 50
+    canMove: 1

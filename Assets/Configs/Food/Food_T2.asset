@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Food_T2
   m_EditorClassIdentifier: Assembly-CSharp::FoodConfig
   foodName: T2
-  icon: {fileID: -5441841738291930802, guid: cef5283f08639594c856c64953495549, type: 3}
+  icon: {fileID: 1139378357, guid: 86b13a6a716c59a408fae7c4d53f11b0, type: 3}
   price: 8
   satietyValue: 45
   bonusGrowthExperience: 2
+  requiredDinoLevel: 2

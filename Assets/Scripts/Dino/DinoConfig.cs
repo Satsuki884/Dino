@@ -19,6 +19,10 @@ public class DinoConfig : ScriptableObject
     [Header("Balance")]
     public float growthTimeMultiplier = 2f;
 
+    [Header("Raid")]
+    public float coinPerRaid = 1f;
+    public float timeToRaid = 10f;
+
     [Header("Stages")]
     public DinoStageData[] stages;
 }

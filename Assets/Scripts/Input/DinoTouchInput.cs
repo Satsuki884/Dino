@@ -8,14 +8,17 @@ using UnityEngine.InputSystem.Controls;
 
 public class DinoTouchInput : MonoBehaviour
 {
-
     [Header("UI Blocking")]
-    public bool blockInputOverUI = true; 
+    public bool blockInputOverUI = true;
+
+    [Header("Raid")]
+    public RaidDropZone raidDropZone;
 
     private Camera mainCamera;
 
     private Dino selectedDino;
     private Vector3 dragOffset;
+    private Vector3 selectedDinoStartPosition;
 
     private bool isDragging;
     private Vector2 pointerStartPosition;
@@ -24,7 +27,8 @@ public class DinoTouchInput : MonoBehaviour
 
     private void Awake()
     {
-        mainCamera = Camera.main;}
+        mainCamera = Camera.main;
+    }
 
     private void Update()
     {
@@ -47,14 +51,19 @@ public class DinoTouchInput : MonoBehaviour
             screenPosition = Mouse.current.position.ReadValue();
         }
 
-        if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed)
+        if (Touchscreen.current != null)
         {
             TouchControl touch = Touchscreen.current.primaryTouch;
 
-            pressedThisFrame = touch.press.wasPressedThisFrame;
-            isPressed = touch.press.isPressed;
-            releasedThisFrame = touch.press.wasReleasedThisFrame;
-            screenPosition = touch.position.ReadValue();
+            if (touch.press.wasPressedThisFrame ||
+                touch.press.isPressed ||
+                touch.press.wasReleasedThisFrame)
+            {
+                pressedThisFrame = touch.press.wasPressedThisFrame;
+                isPressed = touch.press.isPressed;
+                releasedThisFrame = touch.press.wasReleasedThisFrame;
+                screenPosition = touch.position.ReadValue();
+            }
         }
 #else
         pressedThisFrame = Input.GetMouseButtonDown(0);
@@ -76,9 +85,7 @@ public class DinoTouchInput : MonoBehaviour
         if (pressedThisFrame)
         {
             if (blockInputOverUI && IsPointerOverUI())
-            {
                 return;
-            }
 
             pointerStartPosition = screenPosition;
             TrySelectDino(screenPosition);
@@ -108,33 +115,37 @@ public class DinoTouchInput : MonoBehaviour
             mainCamera = Camera.main;
 
             if (mainCamera == null)
-            {
                 return;
-            }
         }
 
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(screenPosition);
         worldPosition.z = 0f;
 
-        Collider2D hit = Physics2D.OverlapPoint(worldPosition);
+        Collider2D[] hits = Physics2D.OverlapPointAll(worldPosition);
 
-        if (hit == null)
+        if (hits == null || hits.Length == 0)
+            return;
+
+        foreach (Collider2D hit in hits)
         {
+            Dino dino = hit.GetComponentInParent<Dino>();
+
+            if (dino == null)
+                continue;
+
+            if (dino.IsInRaid())
+                continue;
+
+            selectedDino = dino;
+            selectedDinoStartPosition = selectedDino.transform.position;
+
+            dragOffset = selectedDino.transform.position - worldPosition;
+            isDragging = false;
+
+            selectedDino.SetDragging(true);
+
             return;
         }
-
-        Dino dino = hit.GetComponentInParent<Dino>();
-
-        if (dino == null)
-        {
-            return;
-        }
-
-        selectedDino = dino;
-        dragOffset = selectedDino.transform.position - worldPosition;
-        isDragging = false;
-
-        selectedDino.SetDragging(true);
     }
 
     private void DragSelected(Vector2 screenPosition)
@@ -144,6 +155,9 @@ public class DinoTouchInput : MonoBehaviour
 
         if (mainCamera == null)
             mainCamera = Camera.main;
+
+        if (mainCamera == null)
+            return;
 
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(screenPosition);
         worldPosition.z = 0f;
@@ -163,11 +177,42 @@ public class DinoTouchInput : MonoBehaviour
 
         selectedDino.SetDragging(false);
 
+        if (TrySendSelectedDinoToRaid())
+        {
+            selectedDino = null;
+            isDragging = false;
+            return;
+        }
+
         if (isDragging)
             TryMergeSelectedDino();
 
         selectedDino = null;
         isDragging = false;
+    }
+
+    private bool TrySendSelectedDinoToRaid()
+    {
+        if (!isDragging)
+            return false;
+
+        if (selectedDino == null)
+            return false;
+
+        if (selectedDino.IsInRaid())
+            return false;
+
+        if (raidDropZone == null)
+            return false;
+
+        if (RaidManager.Instance == null)
+            return false;
+
+        if (!raidDropZone.IsDinoInsideRaidZone(selectedDino))
+            return false;
+
+        RaidManager.Instance.AddDinoToRaid(selectedDino, selectedDinoStartPosition);
+        return true;
     }
 
     private bool TryMergeSelectedDino()

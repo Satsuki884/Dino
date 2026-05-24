@@ -18,4 +18,11 @@ public class DinoStageData
     [Header("Coins")]
     [Tooltip("How many coins this stage gives per tick/second. 0.5 = 1 coin per 2 seconds.")]
     public float coinsPerTick = 0.1f;
+
+    [Header("Movement")]
+    public bool canMove = true;
+
+    [Header("Dropped Coins")]
+    public float spawnedCoinIntervalMin = 5f;
+    public float spawnedCoinIntervalMax = 10f;
 }

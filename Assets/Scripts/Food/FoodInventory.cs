@@ -24,11 +24,22 @@ public class FoodInventory : MonoBehaviour
     {
         foreach (FoodConfig food in availableFoods)
         {
-            if (!foodAmounts.ContainsKey(food))
+            if (food != null && !foodAmounts.ContainsKey(food))
                 foodAmounts.Add(food, 0);
         }
 
         BuildInventoryUI();
+    }
+
+    public bool IsFoodUnlocked(FoodConfig food)
+    {
+        if (food == null)
+            return false;
+
+        if (GameManager.Instance == null)
+            return false;
+
+        return GameManager.Instance.IsLevelUnlocked(food.requiredDinoLevel);
     }
 
     public void AddFood(FoodConfig food, int amount)
@@ -77,6 +88,15 @@ public class FoodInventory : MonoBehaviour
         if (food == null)
             return;
 
+        if (!IsFoodUnlocked(food))
+        {
+            Debug.Log("Food is locked: " + food.foodName);
+            return;
+        }
+
+        if (GameManager.Instance == null)
+            return;
+
         if (!GameManager.Instance.SpendCoins(food.price))
             return;
 
@@ -89,6 +109,9 @@ public class FoodInventory : MonoBehaviour
 
         foreach (FoodConfig food in availableFoods)
         {
+            if (food == null)
+                continue;
+
             FoodSlotUI slot = Instantiate(foodSlotPrefab, foodSlotParent);
             slot.Init(food);
             spawnedSlots.Add(slot);
@@ -101,7 +124,8 @@ public class FoodInventory : MonoBehaviour
     {
         foreach (FoodSlotUI slot in spawnedSlots)
         {
-            slot.Refresh();
+            if (slot != null)
+                slot.Refresh();
         }
     }
 
@@ -114,5 +138,64 @@ public class FoodInventory : MonoBehaviour
         }
 
         spawnedSlots.Clear();
+    }
+
+    public List<FoodSaveData> GetSaveData()
+    {
+        List<FoodSaveData> data = new List<FoodSaveData>();
+
+        foreach (FoodConfig food in availableFoods)
+        {
+            if (food == null)
+                continue;
+
+            FoodSaveData foodData = new FoodSaveData();
+            foodData.foodName = food.foodName;
+            foodData.amount = GetFoodAmount(food);
+
+            data.Add(foodData);
+        }
+
+        return data;
+    }
+
+    public void LoadFromSave(List<FoodSaveData> savedFoods)
+    {
+        if (savedFoods == null)
+            return;
+
+        foodAmounts.Clear();
+
+        foreach (FoodConfig food in availableFoods)
+        {
+            if (food != null && !foodAmounts.ContainsKey(food))
+                foodAmounts.Add(food, 0);
+        }
+
+        foreach (FoodSaveData savedFood in savedFoods)
+        {
+            if (savedFood == null)
+                continue;
+
+            FoodConfig config = GetFoodByName(savedFood.foodName);
+
+            if (config == null)
+                continue;
+
+            foodAmounts[config] = savedFood.amount;
+        }
+
+        RefreshInventoryUI();
+    }
+
+    private FoodConfig GetFoodByName(string foodName)
+    {
+        foreach (FoodConfig food in availableFoods)
+        {
+            if (food != null && food.foodName == foodName)
+                return food;
+        }
+
+        return null;
     }
 }

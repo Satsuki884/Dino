@@ -26,8 +26,29 @@ public class GameManager : MonoBehaviour
 
     [Header("Shop")]
     public ShopManager shopManager;
+    [Header("Spawned Coins")]
+    public SpawnedCoin spawnedCoinPrefab;
+    public Transform spawnedCoinParent;
+
+    public void SpawnDroppedCoin(Vector3 position, int value)
+    {
+        if (value <= 0)
+            return;
+
+        if (spawnedCoinPrefab == null)
+        {
+            Debug.LogWarning("Spawned Coin Prefab is not assigned in GameManager.");
+            return;
+        }
+
+        Transform parent = spawnedCoinParent != null ? spawnedCoinParent : null;
+
+        SpawnedCoin coin = Instantiate(spawnedCoinPrefab, position, Quaternion.identity, parent);
+        coin.Init(value, 5f);
+    }
 
     private readonly List<Dino> activeDinos = new List<Dino>();
+    public IReadOnlyList<Dino> ActiveDinos => activeDinos;
 
     private int highestUnlockedLevel = 1;
 
@@ -40,11 +61,24 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        SpawnDino(1, 1, GetRandomPointInField());
-        UpdateUI();
+        if (SaveManager.HasSave())
+        {
+            LoadGame();
+        }
+        else
+        {
+            SpawnDino(1, 1, GetRandomPointInField());
+            UpdateUI();
+        }
 
         if (shopManager != null)
+        {
             shopManager.BuildShop();
+            shopManager.RefreshShop();
+        }
+
+        if (FoodInventory.Instance != null)
+            FoodInventory.Instance.RefreshInventoryUI();
     }
 
     private void Update()
@@ -87,34 +121,26 @@ public class GameManager : MonoBehaviour
         return activeDinos.Count < maxDinosOnField;
     }
 
-    public bool BuyDino(int level)
+    public void BuyDino(int level)
     {
         if (!CanSpawnMoreDinos())
         {
             Debug.Log("Ліміт динозавриків на полі досягнуто.");
-            return false;
+            return;
         }
 
         DinoConfig config = GetConfigByLevel(level);
 
         if (config == null)
-            return false;
+            return;
 
         if (level > highestUnlockedLevel)
-            return false;
+            return;
 
         if (!SpendCoins(config.buyPrice))
-            return false;
+            return;
 
-        Dino spawnedDino = SpawnDino(level, 1, GetRandomPointInField());
-
-        if (spawnedDino == null)
-            return false;
-
-        if (AudioManager.Instanse != null)
-            AudioManager.Instanse.PlayDeployItem();
-
-        return true;
+        SpawnDino(level, 1, GetRandomPointInField());
     }
 
     public Dino SpawnDino(int level, int stage, Vector3 position)
@@ -171,10 +197,7 @@ public class GameManager : MonoBehaviour
         RemoveDino(first);
         RemoveDino(second);
 
-        Dino mergedDino = SpawnDino(newLevel, 1, spawnPosition);
-
-        if (mergedDino != null && AudioManager.Instanse != null)
-            AudioManager.Instanse.PlayMerge();
+        SpawnDino(newLevel, 1, spawnPosition);
 
         UnlockLevel(newLevel);
         UpdateUI();
@@ -188,6 +211,9 @@ public class GameManager : MonoBehaviour
 
             if (shopManager != null)
                 shopManager.RefreshShop();
+
+            if (FoodInventory.Instance != null)
+                FoodInventory.Instance.RefreshInventoryUI();
         }
     }
 
@@ -278,5 +304,153 @@ public class GameManager : MonoBehaviour
     public bool IsMaxDinoLevel(int level)
     {
         return level >= GetMaxDinoLevel();
+    }
+
+    public void SaveGame()
+    {
+        GameSaveData data = new GameSaveData();
+
+        data.coins = coins;
+        data.highestUnlockedLevel = highestUnlockedLevel;
+
+        foreach (Dino dino in activeDinos)
+        {
+            if (dino == null)
+                continue;
+
+            DinoSaveData dinoData = dino.GetSaveData();
+
+            if (RaidManager.Instance != null &&
+                RaidManager.Instance.TryGetRaidEntryForDino(dino, out RaidEntry raidEntry))
+            {
+                dinoData.isInRaid = true;
+
+                dinoData.raidTimeLeft = raidEntry.timeLeft;
+                dinoData.raidDuration = raidEntry.raidDuration;
+                dinoData.raidRewardCoins = raidEntry.rewardCoins;
+
+                dinoData.raidReturnPositionX = raidEntry.returnPosition.x;
+                dinoData.raidReturnPositionY = raidEntry.returnPosition.y;
+                dinoData.raidReturnPositionZ = raidEntry.returnPosition.z;
+            }
+            else
+            {
+                dinoData.isInRaid = false;
+            }
+
+            data.dinos.Add(dinoData);
+        }
+
+        if (FoodInventory.Instance != null)
+            data.foods = FoodInventory.Instance.GetSaveData();
+
+        SaveManager.Save(data);
+    }
+
+    public void LoadGame()
+    {
+        GameSaveData data = SaveManager.Load();
+
+        if (data == null)
+        {
+            SpawnDino(1, 1, GetRandomPointInField());
+            UpdateUI();
+            return;
+        }
+
+        long currentUnixTime = SaveManager.GetCurrentUnixTime();
+        float offlineSeconds = Mathf.Max(0f, currentUnixTime - data.lastSaveUnixTime);
+
+        coins = data.coins;
+        highestUnlockedLevel = Mathf.Max(1, data.highestUnlockedLevel);
+
+        ClearAllDinos();
+
+        foreach (DinoSaveData dinoData in data.dinos)
+        {
+            if (dinoData == null)
+                continue;
+
+            DinoConfig config = GetConfigByLevel(dinoData.level);
+
+            if (config == null)
+                continue;
+
+            Vector3 position = new Vector3(
+                dinoData.positionX,
+                dinoData.positionY,
+                dinoData.positionZ
+            );
+
+            if (dinoData.isInRaid)
+            {
+                position = new Vector3(
+                    dinoData.raidReturnPositionX,
+                    dinoData.raidReturnPositionY,
+                    dinoData.raidReturnPositionZ
+                );
+            }
+
+            Dino dino = Instantiate(dinoPrefab, position, Quaternion.identity, dinoParent);
+            dino.LoadFromSave(config, dinoData);
+            activeDinos.Add(dino);
+
+            if (dinoData.isInRaid && RaidManager.Instance != null)
+            {
+                Vector3 returnPosition = new Vector3(
+                    dinoData.raidReturnPositionX,
+                    dinoData.raidReturnPositionY,
+                    dinoData.raidReturnPositionZ
+                );
+
+                RaidManager.Instance.RestoreRaidDino(
+                    dino,
+                    returnPosition,
+                    dinoData.raidTimeLeft,
+                    dinoData.raidDuration,
+                    dinoData.raidRewardCoins,
+                    offlineSeconds
+                );
+            }
+        }
+
+        if (activeDinos.Count == 0)
+            SpawnDino(1, 1, GetRandomPointInField());
+
+        if (FoodInventory.Instance != null)
+            FoodInventory.Instance.LoadFromSave(data.foods);
+
+        UpdateUI();
+
+        if (shopManager != null)
+            shopManager.RefreshShop();
+    }
+
+    private void ClearAllDinos()
+    {
+        foreach (Dino dino in activeDinos)
+        {
+            if (dino != null)
+                Destroy(dino.gameObject);
+        }
+
+        activeDinos.Clear();
+    }
+
+    private void OnApplicationQuit()
+    {
+        SaveGame();
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause)
+            SaveGame();
+    }
+
+    [ContextMenu("Delete Save")]
+    public void DeleteSaveForTest()
+    {
+        SaveManager.DeleteSave();
     }
 }
