@@ -20,6 +20,9 @@ public class MainMenuController : MonoBehaviour
     public Button AuthorsBut;
     public Button OptionBut;
 
+    public Button closeOptionsButton;
+    public Button closeAuthorsButton;
+
     private void Awake()
     {
         FindMissingReferences();
