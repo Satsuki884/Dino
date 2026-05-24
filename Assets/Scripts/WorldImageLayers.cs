@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class WorldImageLayers : MonoBehaviour
 {
+    private static readonly int WorldShadowCenterId = Shader.PropertyToID("_WorldShadowCenter");
+    private static readonly int WorldShadowSizeId = Shader.PropertyToID("_WorldShadowSize");
+
     [Serializable]
     public class ImageLayer
     {
@@ -81,6 +84,7 @@ public class WorldImageLayers : MonoBehaviour
         ApplyLayer(background, matchedScale);
         ApplyLayer(foreground, matchedScale);
         ApplyLayer(shadow, matchedScale);
+        UpdateWorldShadowProjection();
 
         lastScreenWidth = Screen.width;
         lastScreenHeight = Screen.height;
@@ -161,5 +165,29 @@ public class WorldImageLayers : MonoBehaviour
         float cameraWidth = cameraHeight * targetCamera.aspect;
 
         return Mathf.Max(cameraWidth / spriteSize.x, cameraHeight / spriteSize.y);
+    }
+
+    private void UpdateWorldShadowProjection()
+    {
+        SpriteRenderer referenceRenderer = background != null
+            ? background.renderer
+            : null;
+
+        if (referenceRenderer == null || referenceRenderer.sprite == null)
+            return;
+
+        Bounds bounds = referenceRenderer.bounds;
+        Shader.SetGlobalVector(WorldShadowCenterId, new Vector4(
+            bounds.center.x,
+            bounds.center.y,
+            0f,
+            0f
+        ));
+        Shader.SetGlobalVector(WorldShadowSizeId, new Vector4(
+            bounds.size.x,
+            bounds.size.y,
+            0f,
+            0f
+        ));
     }
 }
