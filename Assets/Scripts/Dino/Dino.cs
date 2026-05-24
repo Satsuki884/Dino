@@ -20,6 +20,7 @@ public class Dino : MonoBehaviour
     public Slider caloriesSlider;
     public Slider growthSlider;
     public TMP_Text levelText;
+    public GameObject raidReadyIcon;
 
     [Header("Runtime Info")]
     [SerializeField] private DinoConfig config;
@@ -489,6 +490,7 @@ public class Dino : MonoBehaviour
         UpdateCaloriesUI();
         UpdateGrowthUI();
         UpdateLevelText();
+        UpdateRaidReadyIcon();
     }
 
     private void UpdateCaloriesUI()
@@ -648,9 +650,14 @@ public class Dino : MonoBehaviour
         if (Stage <= 1)
             return false;
 
+        if (config == null)
+            return false;
+
+        if (calories < config.minCaloriesForRaid)
+            return false;
+
         return true;
     }
-
     public float GetRaidReward()
     {
         if (config == null)
@@ -685,6 +692,14 @@ public class Dino : MonoBehaviour
 
         UpdateVisual();
         UpdateUI();
+    }
+
+    private void UpdateRaidReadyIcon()
+    {
+        if (raidReadyIcon == null)
+            return;
+
+        raidReadyIcon.SetActive(CanGoToRaid());
     }
 
 }
