@@ -82,8 +82,8 @@ public class FoodSlotUI : MonoBehaviour
 
         if (lockedText != null)
         {
-            lockedText.gameObject.SetActive(!unlocked);
-            lockedText.text = "Lv." + foodConfig.requiredDinoLevel;
+            lockedText.gameObject.SetActive(false);
+            lockedText.text = "";
         }
 
         if (buyButton != null)
