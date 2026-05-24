@@ -51,6 +51,9 @@ public class FoodSlotUI : MonoBehaviour
 
     private void BuyFood()
     {
+        if (AudioManager.Instanse != null)
+            AudioManager.Instanse.PlayClick();
+
         FoodInventory.Instance.BuyFood(foodConfig);
     }
 }

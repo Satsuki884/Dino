@@ -20,7 +20,10 @@ public class DiscoveryPopupUI : MonoBehaviour
         Instance = this;
 
         if (closeButton != null)
+        {
+            closeButton.onClick.AddListener(PlayClick);
             closeButton.onClick.AddListener(Hide);
+        }
 
         Hide();
     }
@@ -67,5 +70,11 @@ public class DiscoveryPopupUI : MonoBehaviour
     {
         if (root != null)
             root.SetActive(false);
+    }
+
+    private void PlayClick()
+    {
+        if (AudioManager.Instanse != null)
+            AudioManager.Instanse.PlayClick();
     }
 }

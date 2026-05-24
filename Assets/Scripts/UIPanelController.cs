@@ -47,10 +47,10 @@ public class UIPanelController : MonoBehaviour
             foodButton.onClick.AddListener(OnFoodButtonClicked);
 
         if (shopCloseButton != null)
-            shopCloseButton.onClick.AddListener(CloseAllPanels);
+            shopCloseButton.onClick.AddListener(OnCloseButtonClicked);
 
         if (foodCloseButton != null)
-            foodCloseButton.onClick.AddListener(CloseAllPanels);
+            foodCloseButton.onClick.AddListener(OnCloseButtonClicked);
 
         CloseAllPanels();
     }
@@ -85,12 +85,20 @@ public class UIPanelController : MonoBehaviour
 
     private void OnShopButtonClicked()
     {
+        PlayClick();
         HandlePanelButtonClick(shopPanel, shopPanelRect);
     }
 
     private void OnFoodButtonClicked()
     {
+        PlayClick();
         HandlePanelButtonClick(foodInventoryPanel, foodInventoryPanelRect);
+    }
+
+    private void OnCloseButtonClicked()
+    {
+        PlayClick();
+        CloseAllPanels();
     }
 
     private void HandlePanelButtonClick(GameObject targetPanel, RectTransform targetPanelRect)
@@ -139,6 +147,12 @@ public class UIPanelController : MonoBehaviour
 
         currentOpenPanel = null;
         currentOpenPanelRect = null;
+    }
+
+    private void PlayClick()
+    {
+        if (AudioManager.Instanse != null)
+            AudioManager.Instanse.PlayClick();
     }
 
     private bool IsClickInsideRect(RectTransform rect, Vector2 screenPosition)

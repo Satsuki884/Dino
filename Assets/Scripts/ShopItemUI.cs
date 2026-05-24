@@ -81,7 +81,11 @@ public class ShopItemUI : MonoBehaviour
         if (config == null)
             return;
 
-        GameManager.Instance.BuyDino(config.level);
+        bool bought = GameManager.Instance.BuyDino(config.level);
+
+        if (!bought && AudioManager.Instanse != null)
+            AudioManager.Instanse.PlayClick();
+
         Refresh();
     }
 }

@@ -75,4 +75,19 @@ public class AudioManager : MonoBehaviour
         SFXSource.PlayOneShot(clip);
     }
 
+    public void PlayClick()
+    {
+        PlaySFX(klick);
+    }
+
+    public void PlayDeployItem()
+    {
+        PlaySFX(deploy_item);
+    }
+
+    public void PlayMerge()
+    {
+        PlaySFX(marge);
+    }
+
 }

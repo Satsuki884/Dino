@@ -87,26 +87,34 @@ public class GameManager : MonoBehaviour
         return activeDinos.Count < maxDinosOnField;
     }
 
-    public void BuyDino(int level)
+    public bool BuyDino(int level)
     {
         if (!CanSpawnMoreDinos())
         {
             Debug.Log("Ліміт динозавриків на полі досягнуто.");
-            return;
+            return false;
         }
 
         DinoConfig config = GetConfigByLevel(level);
 
         if (config == null)
-            return;
+            return false;
 
         if (level > highestUnlockedLevel)
-            return;
+            return false;
 
         if (!SpendCoins(config.buyPrice))
-            return;
+            return false;
 
-        SpawnDino(level, 1, GetRandomPointInField());
+        Dino spawnedDino = SpawnDino(level, 1, GetRandomPointInField());
+
+        if (spawnedDino == null)
+            return false;
+
+        if (AudioManager.Instanse != null)
+            AudioManager.Instanse.PlayDeployItem();
+
+        return true;
     }
 
     public Dino SpawnDino(int level, int stage, Vector3 position)
@@ -163,7 +171,10 @@ public class GameManager : MonoBehaviour
         RemoveDino(first);
         RemoveDino(second);
 
-        SpawnDino(newLevel, 1, spawnPosition);
+        Dino mergedDino = SpawnDino(newLevel, 1, spawnPosition);
+
+        if (mergedDino != null && AudioManager.Instanse != null)
+            AudioManager.Instanse.PlayMerge();
 
         UnlockLevel(newLevel);
         UpdateUI();
