@@ -31,7 +31,7 @@ MonoBehaviour:
     spawnedCoinIntervalMin: 5
     spawnedCoinIntervalMax: 10
   - stageName: Baby
-    sprite: {fileID: -6401606816287825563, guid: dc60207252848c74993ecbd44ab05209, type: 3}
+    sprite: {fileID: -7033090210418254279, guid: 9a1e0c98d892ea945abf7981f2d56972, type: 3}
     ticksToNextStage: 20
     caloriesConsumePerTick: 4
     coinsPerTick: 0.5
@@ -39,7 +39,7 @@ MonoBehaviour:
     spawnedCoinIntervalMin: 5
     spawnedCoinIntervalMax: 10
   - stageName: Dino
-    sprite: {fileID: -6401606816287825563, guid: dc60207252848c74993ecbd44ab05209, type: 3}
+    sprite: {fileID: -974494812864979246, guid: 675d8366b95a4f146adfc24a6df8ea76, type: 3}
     ticksToNextStage: 0
     caloriesConsumePerTick: 2
     coinsPerTick: 2
