@@ -38,7 +38,7 @@ public class ShopItemUI : MonoBehaviour
             nameText.text = config.dinoName + " Lv." + config.level;
 
         if (priceText != null)
-            priceText.text = CoinFormatter.FormatNumber(config.buyPrice);
+            priceText.text = CoinFormatter.FormatNumber(GameManager.Instance.GetDinoEggPrice(config.level));
 
         Sprite firstStageSprite = GetFirstStageSprite();
 
