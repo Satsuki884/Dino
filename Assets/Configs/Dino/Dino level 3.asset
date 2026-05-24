@@ -18,7 +18,7 @@ MonoBehaviour:
   startCalories: 448
   moveSpeed: 1.4
   growthTimeMultiplier: 2
-  coinPerRaid: 288
+  coinPerRaid: 1884
   timeToRaid: 36
   minCaloriesForRaid: 1440
   stages:
