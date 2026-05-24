@@ -38,7 +38,7 @@ public class ShopItemUI : MonoBehaviour
             nameText.text = config.dinoName + " Lv." + config.level;
 
         if (priceText != null)
-            priceText.text = config.buyPrice.ToString();
+            priceText.text = CoinFormatter.FormatNumber(config.buyPrice);
 
         Sprite firstStageSprite = GetFirstStageSprite();
 

@@ -284,7 +284,7 @@ public class GameManager : MonoBehaviour
     private void UpdateUI()
     {
         if (coinsText != null)
-            coinsText.text = "Coins: " + coins;
+            coinsText.text = "Coins: " + CoinFormatter.FormatNumber(coins);
 
         if (dinoLimitText != null)
             dinoLimitText.text = activeDinos.Count + " / " + maxDinosOnField;

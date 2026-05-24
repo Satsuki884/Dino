@@ -31,7 +31,7 @@ public class FoodSlotUI : MonoBehaviour
         }
 
         if (priceText != null)
-            priceText.text = foodConfig.price.ToString();
+            priceText.text = CoinFormatter.FormatNumber(foodConfig.price);
 
         if (buyButton != null)
         {
@@ -63,7 +63,7 @@ public class FoodSlotUI : MonoBehaviour
             amountText.text = unlocked ? amount.ToString() : "";
 
         if (priceText != null)
-            priceText.text = unlocked ? foodConfig.price.ToString() : "";
+            priceText.text = unlocked ? CoinFormatter.FormatNumber(foodConfig.price) : "";
 
         if (iconImage != null)
         {
