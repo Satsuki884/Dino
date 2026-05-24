@@ -130,26 +130,26 @@ public class GameManager : MonoBehaviour
         return activeDinos.Count < maxDinosOnField;
     }
 
-    public void BuyDino(int level)
+    public bool BuyDino(int level)
     {
         if (!CanSpawnMoreDinos())
         {
             Debug.Log("Ліміт динозавриків на полі досягнуто.");
-            return;
+            return false;
         }
 
         DinoConfig config = GetConfigByLevel(level);
 
         if (config == null)
-            return;
+            return false;
 
         if (!IsDinoEggUnlockedInShop(level))
-            return;
+            return false;
 
         int currentPrice = GetDinoEggPrice(level);
 
         if (!SpendCoins(currentPrice))
-            return;
+            return false;
 
         Dino spawnedDino = SpawnDino(level, 1, GetRandomPointInField());
 
@@ -157,13 +157,15 @@ public class GameManager : MonoBehaviour
         {
             coins += currentPrice;
             UpdateUI();
-            return;
+            return false;
         }
 
         RegisterDinoEggPurchase(level);
 
         if (shopManager != null)
             shopManager.RefreshShop();
+
+        return true;
     }
 
     public Dino SpawnDino(int level, int stage, Vector3 position)

@@ -22,7 +22,7 @@ MonoBehaviour:
   timeToRaid: 10
   stages:
   - stageName: Stage 1
-    sprite: {fileID: -8825533296577842504, guid: 042b87bef168ab94e8f59367d0cc034f, type: 3}
+    sprite: {fileID: -7475038807813967987, guid: 521ab6285994db549b1cb95dc47d6a37, type: 3}
     ticksToNextStage: 14
     caloriesConsumePerTick: 16
     coinsPerTick: 0.5
