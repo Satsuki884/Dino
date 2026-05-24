@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 5195c0e281f7f874ab24d1648a2a4d10
+guid: 244319177b8ca6447b45729dd9f6e6b6
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1451478870644479156
-    second: Dino 2_0
+      213: 6211882051771875804
+    second: panel_foodstore_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -51,7 +51,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 512
+  spritePixelsToUnits: 150
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -126,23 +126,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Dino 2_0
+      name: panel_foodstore_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 512
-        height: 512
+        width: 1100
+        height: 450
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 4b4dfb3b750b42410800000000000000
-      internalID: 1451478870644479156
+      spriteID: cd1cc7a60d9053650800000000000000
+      internalID: 6211882051771875804
       vertices: []
       indices: 
       edges: []
@@ -151,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 905f6f294cacd514e80094a240ab84dd
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Dino 2_0: 1451478870644479156
+      panel_foodstore_0: 6211882051771875804
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

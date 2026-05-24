@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 #if ENABLE_INPUT_SYSTEM
@@ -33,6 +34,7 @@ public class UIPanelController : MonoBehaviour
     public GameObject miniMenuPanel;
     public Button miniMenuButton;
     public Button resumeButton;
+    public Button mainMenuButton;
     public Slider musicVolumeSlider;
     public Slider sfxVolumeSlider;
 
@@ -144,6 +146,16 @@ public class UIPanelController : MonoBehaviour
     {
         PlayClick();
         CloseMiniMenu();
+    }
+
+    private void OnMainMenuButtonClicked()
+    {
+        PlayClick();
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.SaveGame();
+
+        SceneManager.LoadScene("Main Menu");
     }
 
     private void HandlePanelButtonClick(GameObject targetPanel, RectTransform targetPanelRect)
@@ -393,6 +405,9 @@ public class UIPanelController : MonoBehaviour
         if (resumeButton == null)
             resumeButton = FindButton("Resume_but");
 
+        if (mainMenuButton == null)
+            mainMenuButton = FindButton("Main_menu_but");
+
         if (musicVolumeSlider == null)
             musicVolumeSlider = FindSlider("Music_vol");
 
@@ -424,6 +439,12 @@ public class UIPanelController : MonoBehaviour
         {
             resumeButton.onClick.RemoveListener(OnResumeButtonClicked);
             resumeButton.onClick.AddListener(OnResumeButtonClicked);
+        }
+
+        if (mainMenuButton != null)
+        {
+            mainMenuButton.onClick.RemoveListener(OnMainMenuButtonClicked);
+            mainMenuButton.onClick.AddListener(OnMainMenuButtonClicked);
         }
 
         if (musicVolumeSlider != null)
