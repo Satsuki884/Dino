@@ -12,6 +12,7 @@ public class GameSaveData
 
     public List<DinoSaveData> dinos = new List<DinoSaveData>();
     public List<FoodSaveData> foods = new List<FoodSaveData>();
+    public List<DinoEggPriceSaveData> dinoEggPrices = new List<DinoEggPriceSaveData>();
 }
 
 [Serializable]
@@ -43,4 +44,11 @@ public class FoodSaveData
 {
     public string foodName;
     public int amount;
+}
+
+[Serializable]
+public class DinoEggPriceSaveData
+{
+    public int level;
+    public int purchaseCount;
 }

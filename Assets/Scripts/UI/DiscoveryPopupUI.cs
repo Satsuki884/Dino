@@ -10,8 +10,7 @@ public class DiscoveryPopupUI : MonoBehaviour
     public GameObject root;
     public Image dinoIcon;
     public TMP_Text titleText;
-    public TMP_Text levelText;
-    public TMP_Text stageText;
+    public TMP_Text levelStageText;
     public TMP_Text coinsText;
     public Button closeButton;
 
@@ -20,10 +19,7 @@ public class DiscoveryPopupUI : MonoBehaviour
         Instance = this;
 
         if (closeButton != null)
-        {
-            closeButton.onClick.AddListener(PlayClick);
             closeButton.onClick.AddListener(Hide);
-        }
 
         Hide();
     }
@@ -50,13 +46,10 @@ public class DiscoveryPopupUI : MonoBehaviour
         if (titleText != null)
             titleText.text = "New Dinosaur Discovered!";
 
-        if (levelText != null)
-            levelText.text = "Level: " + config.level;
-
-        if (stageText != null)
+        if (levelStageText != null)
         {
             string stageName = stageData != null ? stageData.stageName : stage.ToString();
-            stageText.text = "Stage: " + stageName;
+            levelStageText.text = "Level: " + config.level + " - Stage: " + stageName;
         }
 
         if (coinsText != null)
@@ -70,11 +63,5 @@ public class DiscoveryPopupUI : MonoBehaviour
     {
         if (root != null)
             root.SetActive(false);
-    }
-
-    private void PlayClick()
-    {
-        if (AudioManager.Instanse != null)
-            AudioManager.Instanse.PlayClick();
     }
 }

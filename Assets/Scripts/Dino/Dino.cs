@@ -6,6 +6,10 @@ public class Dino : MonoBehaviour
 {
     [Header("Visual")]
     public SpriteRenderer spriteRenderer;
+    [Tooltip("Enable this if the sprite art faces left when Flip X is off.")]
+    public bool spriteFacesLeftByDefault = true;
+    public float walkTiltAngle = 6f;
+    public float walkTiltSpeed = 6f;
 
     [Header("UI Above Head")]
     public Slider caloriesSlider;
@@ -28,6 +32,7 @@ public class Dino : MonoBehaviour
     private bool isDragging;
     private float tickTimer;
     private bool isInRaid;
+    private Quaternion spriteStartRotation;
 
     public int Level => config != null ? config.level : 0;
     public int Stage => currentStage;
@@ -57,6 +62,8 @@ public class Dino : MonoBehaviour
 
         if (!isDragging && CanMoveByStage())
             Move();
+        else
+            ResetWalkAnimation();
 
         HandleTick();
         HandleDroppedCoinSpawn();
@@ -89,7 +96,16 @@ public class Dino : MonoBehaviour
 
         ScheduleNextDroppedCoin();
         UpdateVisual();
+        CacheSpriteStartRotation();
         UpdateUI();
+    }
+
+    private void CacheSpriteStartRotation()
+    {
+        if (spriteRenderer == null)
+            return;
+
+        spriteStartRotation = spriteRenderer.transform.localRotation;
     }
 
     private void ScheduleNextDroppedCoin()
@@ -327,8 +343,41 @@ public class Dino : MonoBehaviour
         if (moveDirection != Vector2.zero)
             moveDirection.Normalize();
 
-        if (spriteRenderer != null && moveDirection.x != 0)
-            spriteRenderer.flipX = moveDirection.x < 0;
+        UpdateFacingDirection();
+        UpdateWalkAnimation();
+    }
+
+    private void UpdateFacingDirection()
+    {
+        if (spriteRenderer == null)
+            return;
+
+        if (Mathf.Abs(moveDirection.x) <= 0.01f)
+            return;
+
+        bool movingRight = moveDirection.x > 0f;
+        spriteRenderer.flipX = spriteFacesLeftByDefault ? movingRight : !movingRight;
+    }
+
+    private void UpdateWalkAnimation()
+    {
+        if (spriteRenderer == null)
+            return;
+
+        float tilt = Mathf.Sin(Time.time * walkTiltSpeed) * walkTiltAngle;
+        spriteRenderer.transform.localRotation = spriteStartRotation * Quaternion.Euler(0f, 0f, tilt);
+    }
+
+    private void ResetWalkAnimation()
+    {
+        if (spriteRenderer == null)
+            return;
+
+        spriteRenderer.transform.localRotation = Quaternion.Lerp(
+            spriteRenderer.transform.localRotation,
+            spriteStartRotation,
+            Time.deltaTime * walkTiltSpeed
+        );
     }
 
     public bool CanMergeWith(Dino other)
@@ -349,6 +398,9 @@ public class Dino : MonoBehaviour
             return false;
 
         if (!other.IsFinalStage())
+            return false;
+
+        if (IsMaxDino() || other.IsMaxDino())
             return false;
 
         return true;

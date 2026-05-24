@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: f649b8a44ab53e047873b5a1f674fdde
+guid: 4e1c9fdf7bf027e469c08bb48e21bed6
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7632726977687793552
-    second: dino5_0
+      213: 5605862757442715119
+    second: Egg_t5_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -109,24 +109,11 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WindowsStoreApps
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: dino5_0
+      name: Egg_t5_0
       rect:
         serializedVersion: 2
         x: 0
@@ -134,15 +121,15 @@ TextureImporter:
         width: 512
         height: 512
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 070d063f04b131690800000000000000
-      internalID: -7632726977687793552
+      spriteID: fedf6fc0a760ccd40800000000000000
+      internalID: 5605862757442715119
       vertices: []
       indices: 
       edges: []
@@ -151,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: dc31348650ee2414fa2e806cfd0f664f
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -159,13 +146,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries:
-      - key: SpriteEditor.SliceOnImport
-        value: True
-      - key: SpriteEditor.SliceSettings
-        value: '{"sliceOnImport":true,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":512.0,"y":512.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
+      entries: []
     nameFileIdTable:
-      dino5_0: -7632726977687793552
+      Egg_t5_0: 5605862757442715119
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

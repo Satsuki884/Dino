@@ -26,6 +26,13 @@ public class GameManager : MonoBehaviour
 
     [Header("Shop")]
     public ShopManager shopManager;
+
+    [Header("Shop Price Growth")]
+    [Tooltip("Each bought egg of the same level multiplies the next price by this value.")]
+    public float dinoEggPriceGrowthMultiplier = 1.18f;
+    [Tooltip("Prices are rounded up to this step. Use 1 for no step rounding.")]
+    public int dinoEggPriceRoundTo = 1;
+
     [Header("Spawned Coins")]
     public SpawnedCoin spawnedCoinPrefab;
     public Transform spawnedCoinParent;
@@ -51,6 +58,8 @@ public class GameManager : MonoBehaviour
     public IReadOnlyList<Dino> ActiveDinos => activeDinos;
 
     private int highestUnlockedLevel = 1;
+
+    private readonly Dictionary<int, int> dinoEggPurchaseCounts = new Dictionary<int, int>();
 
     private readonly HashSet<string> discoveredDinoStages = new HashSet<string>();
 
@@ -134,19 +143,27 @@ public class GameManager : MonoBehaviour
         if (config == null)
             return false;
 
-        if (level > highestUnlockedLevel)
+        if (!IsDinoEggUnlockedInShop(level))
             return false;
 
-        if (!SpendCoins(config.buyPrice))
+        int currentPrice = GetDinoEggPrice(level);
+
+        if (!SpendCoins(currentPrice))
             return false;
 
         Dino spawnedDino = SpawnDino(level, 1, GetRandomPointInField());
 
         if (spawnedDino == null)
+        {
+            coins += currentPrice;
+            UpdateUI();
             return false;
+        }
 
-        if (AudioManager.Instanse != null)
-            AudioManager.Instanse.PlayDeployItem();
+        RegisterDinoEggPurchase(level);
+
+        if (shopManager != null)
+            shopManager.RefreshShop();
 
         return true;
     }
@@ -200,15 +217,19 @@ public class GameManager : MonoBehaviour
             return;
 
         int newLevel = first.Level + 1;
+
+        if (!HasConfigForLevel(newLevel))
+        {
+            Debug.Log("Cannot merge dinos: no DinoConfig for level " + newLevel + ".");
+            return;
+        }
+
         Vector3 spawnPosition = (first.transform.position + second.transform.position) / 2f;
 
         RemoveDino(first);
         RemoveDino(second);
 
-        Dino mergedDino = SpawnDino(newLevel, 1, spawnPosition);
-
-        if (mergedDino != null && AudioManager.Instanse != null)
-            AudioManager.Instanse.PlayMerge();
+        SpawnDino(newLevel, 1, spawnPosition);
 
         UnlockLevel(newLevel);
         UpdateUI();
@@ -254,6 +275,61 @@ public class GameManager : MonoBehaviour
         return level <= highestUnlockedLevel;
     }
 
+    public bool IsDinoEggUnlockedInShop(int eggLevel)
+    {
+        if (eggLevel <= 1)
+            return true;
+
+        return highestUnlockedLevel >= GetRequiredDinoLevelForShopEgg(eggLevel);
+    }
+
+    public int GetRequiredDinoLevelForShopEgg(int eggLevel)
+    {
+        if (eggLevel <= 1)
+            return 1;
+
+        return eggLevel + 2;
+    }
+
+    public int GetDinoEggPrice(int level)
+    {
+        DinoConfig config = GetConfigByLevel(level);
+
+        if (config == null)
+            return 0;
+
+        int purchaseCount = GetDinoEggPurchaseCount(level);
+        float multiplier = Mathf.Max(1f, dinoEggPriceGrowthMultiplier);
+        float rawPrice = config.buyPrice * Mathf.Pow(multiplier, purchaseCount);
+
+        return RoundPriceUp(rawPrice);
+    }
+
+    private int GetDinoEggPurchaseCount(int level)
+    {
+        if (!dinoEggPurchaseCounts.TryGetValue(level, out int purchaseCount))
+            return 0;
+
+        return Mathf.Max(0, purchaseCount);
+    }
+
+    private void RegisterDinoEggPurchase(int level)
+    {
+        int purchaseCount = GetDinoEggPurchaseCount(level);
+        dinoEggPurchaseCounts[level] = purchaseCount + 1;
+    }
+
+    private int RoundPriceUp(float price)
+    {
+        int roundTo = Mathf.Max(1, dinoEggPriceRoundTo);
+        int wholePrice = Mathf.Max(1, Mathf.CeilToInt(price));
+
+        if (roundTo <= 1)
+            return wholePrice;
+
+        return Mathf.CeilToInt(wholePrice / (float)roundTo) * roundTo;
+    }
+
     public DinoConfig GetConfigByLevel(int level)
     {
         foreach (DinoConfig config in dinoConfigs)
@@ -288,7 +364,7 @@ public class GameManager : MonoBehaviour
     private void UpdateUI()
     {
         if (coinsText != null)
-            coinsText.text = "Coins: " + coins;
+            coinsText.text = "Coins: " + CoinFormatter.FormatNumber(coins);
 
         if (dinoLimitText != null)
             dinoLimitText.text = activeDinos.Count + " / " + maxDinosOnField;
@@ -323,6 +399,7 @@ public class GameManager : MonoBehaviour
 
         data.coins = coins;
         data.highestUnlockedLevel = highestUnlockedLevel;
+        data.dinoEggPrices = GetDinoEggPriceSaveData();
 
         foreach (Dino dino in activeDinos)
         {
@@ -374,6 +451,7 @@ public class GameManager : MonoBehaviour
 
         coins = data.coins;
         highestUnlockedLevel = Mathf.Max(1, data.highestUnlockedLevel);
+        LoadDinoEggPriceData(data.dinoEggPrices);
 
         ClearAllDinos();
 
@@ -446,6 +524,41 @@ public class GameManager : MonoBehaviour
         }
 
         activeDinos.Clear();
+    }
+
+    private List<DinoEggPriceSaveData> GetDinoEggPriceSaveData()
+    {
+        List<DinoEggPriceSaveData> saveData = new List<DinoEggPriceSaveData>();
+
+        foreach (KeyValuePair<int, int> pair in dinoEggPurchaseCounts)
+        {
+            DinoEggPriceSaveData priceData = new DinoEggPriceSaveData();
+            priceData.level = pair.Key;
+            priceData.purchaseCount = Mathf.Max(0, pair.Value);
+
+            saveData.Add(priceData);
+        }
+
+        return saveData;
+    }
+
+    private void LoadDinoEggPriceData(List<DinoEggPriceSaveData> saveData)
+    {
+        dinoEggPurchaseCounts.Clear();
+
+        if (saveData == null)
+            return;
+
+        foreach (DinoEggPriceSaveData priceData in saveData)
+        {
+            if (priceData == null)
+                continue;
+
+            if (priceData.level <= 0)
+                continue;
+
+            dinoEggPurchaseCounts[priceData.level] = Mathf.Max(0, priceData.purchaseCount);
+        }
     }
 
     private void OnApplicationQuit()

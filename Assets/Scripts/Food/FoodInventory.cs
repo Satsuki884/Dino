@@ -33,13 +33,7 @@ public class FoodInventory : MonoBehaviour
 
     public bool IsFoodUnlocked(FoodConfig food)
     {
-        if (food == null)
-            return false;
-
-        if (GameManager.Instance == null)
-            return false;
-
-        return GameManager.Instance.IsLevelUnlocked(food.requiredDinoLevel);
+        return food != null;
     }
 
     public void AddFood(FoodConfig food, int amount)
@@ -87,12 +81,6 @@ public class FoodInventory : MonoBehaviour
     {
         if (food == null)
             return;
-
-        if (!IsFoodUnlocked(food))
-        {
-            Debug.Log("Food is locked: " + food.foodName);
-            return;
-        }
 
         if (GameManager.Instance == null)
             return;

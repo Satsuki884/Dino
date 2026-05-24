@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 045dd045d5ed8324e9985b66804048b0
+guid: ef71da5c225e3af4eb0f655781017716
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -974494812864979246
-    second: "Illustration257\u043E\u043E \u0440\u044068_0"
+      213: 7255117620054469359
+    second: Egg_t7_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,7 +113,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "Illustration257\u043E\u043E \u0440\u044068_0"
+      name: Egg_t7_0
       rect:
         serializedVersion: 2
         x: 0
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 2ded8bb7126e972f0800000000000000
-      internalID: -974494812864979246
+      spriteID: fea2603490b5fa460800000000000000
+      internalID: 7255117620054469359
       vertices: []
       indices: 
       edges: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: b9d645649c4d1284a8106f01f3c36553
+    spriteID: 2a13cd7735b5e684eabaac255cf1a84d
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "Illustration257\u043E\u043E \u0440\u044068_0": -974494812864979246
+      Egg_t7_0: 7255117620054469359
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

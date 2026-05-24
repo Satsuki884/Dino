@@ -13,6 +13,6 @@ public class RaidCoinsUI : MonoBehaviour
         if (GameManager.Instance == null)
             return;
 
-        coinsText.text = "Coins: " + GameManager.Instance.coins;
+        coinsText.text = "Coins: " + CoinFormatter.FormatNumber(GameManager.Instance.coins);
     }
 }

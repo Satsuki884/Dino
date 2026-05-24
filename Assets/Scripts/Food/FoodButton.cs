@@ -14,7 +14,7 @@ public class FoodButton : MonoBehaviour
     private void Start()
     {
         if (priceText != null && foodConfig != null)
-            priceText.text = foodConfig.foodName + ": " + foodConfig.price;
+            priceText.text = foodConfig.foodName + ": " + CoinFormatter.FormatNumber(foodConfig.price);
 
         if (button != null)
             button.onClick.AddListener(BuyFood);
