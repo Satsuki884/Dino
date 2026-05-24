@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
@@ -166,12 +167,49 @@ public class UIPanelController : MonoBehaviour
         CloseAllPanels();
 
         panel.SetActive(true);
+        ResetPanelScrollPositions(panel);
 
         if (panel == foodInventoryPanel)
             ShowFoodPanelVisuals();
 
         currentOpenPanel = panel;
         currentOpenPanelRect = panelRect;
+    }
+
+    private void ResetPanelScrollPositions(GameObject panel)
+    {
+        if (panel == null)
+            return;
+
+        ScrollRect[] scrollRects = panel.GetComponentsInChildren<ScrollRect>(true);
+
+        foreach (ScrollRect scrollRect in scrollRects)
+        {
+            if (scrollRect == null)
+                continue;
+
+            Canvas.ForceUpdateCanvases();
+            scrollRect.verticalNormalizedPosition = 1f;
+            scrollRect.horizontalNormalizedPosition = 0f;
+        }
+
+        StartCoroutine(ResetPanelScrollPositionsNextFrame(scrollRects));
+    }
+
+    private IEnumerator ResetPanelScrollPositionsNextFrame(ScrollRect[] scrollRects)
+    {
+        yield return null;
+
+        Canvas.ForceUpdateCanvases();
+
+        foreach (ScrollRect scrollRect in scrollRects)
+        {
+            if (scrollRect == null)
+                continue;
+
+            scrollRect.verticalNormalizedPosition = 1f;
+            scrollRect.horizontalNormalizedPosition = 0f;
+        }
     }
 
     public void CloseAllPanels()
