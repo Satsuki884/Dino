@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FoodConfig
   foodName: T1
   icon: {fileID: 1775159377265996148, guid: e899c2c68ec05964ab9a16e7c21fd43e, type: 3}
-  price: 2
-  satietyValue: 10
-  bonusGrowthExperience: 0
+  price: 60
+  satietyValue: 320
+  bonusGrowthExperience: 5
+  requiredDinoLevel: 1

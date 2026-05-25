@@ -3,8 +3,8 @@
   "WorkspaceRootPath": "D:\\game_jam\\Dino\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{0C7B4658-8421-1991-0A04-14E3FFB1A490}|Assembly-CSharp.csproj|d:\\game_jam\\dino\\assets\\scripts\\audio\\audiomanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0C7B4658-8421-1991-0A04-14E3FFB1A490}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\audio\\audiomanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0C7B4658-8421-1991-0A04-14E3FFB1A490}|Assembly-CSharp.csproj|d:\\game_jam\\dino\\assets\\scripts\\ui\\uipanelcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0C7B4658-8421-1991-0A04-14E3FFB1A490}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\ui\\uipanelcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -23,14 +23,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "AudioManager.cs",
-              "DocumentMoniker": "D:\\game_jam\\Dino\\Assets\\Scripts\\Audio\\AudioManager.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\Audio\\AudioManager.cs",
-              "ToolTip": "D:\\game_jam\\Dino\\Assets\\Scripts\\Audio\\AudioManager.cs",
-              "RelativeToolTip": "Assets\\Scripts\\Audio\\AudioManager.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAaAAAAAAAAAA==",
+              "Title": "UIPanelController.cs",
+              "DocumentMoniker": "D:\\game_jam\\Dino\\Assets\\Scripts\\UI\\UIPanelController.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\UI\\UIPanelController.cs",
+              "ToolTip": "D:\\game_jam\\Dino\\Assets\\Scripts\\UI\\UIPanelController.cs*",
+              "RelativeToolTip": "Assets\\Scripts\\UI\\UIPanelController.cs*",
+              "ViewState": "AgIAAIEAAAAAAAAAAIAxwJ4AAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-23T08:37:21.823Z",
+              "WhenOpened": "2026-05-24T16:39:55.556Z",
               "EditorCaption": ""
             }
           ]

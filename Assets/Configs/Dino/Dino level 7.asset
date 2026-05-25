@@ -13,35 +13,36 @@ MonoBehaviour:
   m_Name: Dino level 7
   m_EditorClassIdentifier: Assembly-CSharp::DinoConfig
   level: 7
-  dinoName: Dino level 7
-  buyPrice: 500
-  startCalories: 2550
+  dinoName: Ancient Horror
+  buyPrice: 384600
+  startCalories: 20500
   moveSpeed: 0.9
   growthTimeMultiplier: 2
-  coinPerRaid: 1
-  timeToRaid: 10
+  coinPerRaid: 1310450
+  timeToRaid: 300
+  minCaloriesForRaid: 124000
   stages:
-  - stageName: Stage 1
+  - stageName: Egg
     sprite: {fileID: 7255117620054469359, guid: ef71da5c225e3af4eb0f655781017716, type: 3}
-    ticksToNextStage: 35
-    caloriesConsumePerTick: 30
-    coinsPerTick: 2
+    ticksToNextStage: 64
+    caloriesConsumePerTick: 320
+    coinsPerTick: 15
     canMove: 0
-    spawnedCoinIntervalMin: 5
-    spawnedCoinIntervalMax: 10
-  - stageName: Stage 2
+    spawnedCoinIntervalMin: 300000
+    spawnedCoinIntervalMax: 400000
+  - stageName: Baby
     sprite: {fileID: -3866946262359525832, guid: 3362dab8f315d0f4fb035740d18b65d3, type: 3}
-    ticksToNextStage: 60
-    caloriesConsumePerTick: 25
-    coinsPerTick: 100
+    ticksToNextStage: 120
+    caloriesConsumePerTick: 300
+    coinsPerTick: 1500
     canMove: 1
-    spawnedCoinIntervalMin: 5
-    spawnedCoinIntervalMax: 10
-  - stageName: Stage 3
+    spawnedCoinIntervalMin: 300000
+    spawnedCoinIntervalMax: 400000
+  - stageName: Dino
     sprite: {fileID: -3072019042627757946, guid: 1ab2ebce05dd53641a15ebd38faf6d94, type: 3}
     ticksToNextStage: 0
-    caloriesConsumePerTick: 18
-    coinsPerTick: 100
+    caloriesConsumePerTick: 284
+    coinsPerTick: 4000
     canMove: 1
-    spawnedCoinIntervalMin: 5
-    spawnedCoinIntervalMax: 10
+    spawnedCoinIntervalMin: 30000
+    spawnedCoinIntervalMax: 30000

@@ -35,7 +35,7 @@ public class ShopItemUI : MonoBehaviour
         bool hasSpace = GameManager.Instance.CanSpawnMoreDinos();
 
         if (nameText != null)
-            nameText.text = config.dinoName + " Lv." + config.level;
+            nameText.text = config.dinoName;
 
         if (priceText != null)
             priceText.text = CoinFormatter.FormatNumber(GameManager.Instance.GetDinoEggPrice(config.level));

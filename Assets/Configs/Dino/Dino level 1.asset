@@ -13,15 +13,16 @@ MonoBehaviour:
   m_Name: Dino level 1
   m_EditorClassIdentifier: Assembly-CSharp::DinoConfig
   level: 1
-  dinoName: 'Dino level 1 '
+  dinoName: Picklesaurus
   buyPrice: 10
-  startCalories: 110
+  startCalories: 40
   moveSpeed: 1
   growthTimeMultiplier: 2
-  coinPerRaid: 1
+  coinPerRaid: 276
   timeToRaid: 10
+  minCaloriesForRaid: 320
   stages:
-  - stageName: Stage 1
+  - stageName: Egg
     sprite: {fileID: -6401606816287825563, guid: dc60207252848c74993ecbd44ab05209, type: 3}
     ticksToNextStage: 5
     caloriesConsumePerTick: 6
@@ -29,7 +30,7 @@ MonoBehaviour:
     canMove: 0
     spawnedCoinIntervalMin: 5
     spawnedCoinIntervalMax: 10
-  - stageName: Stage 2
+  - stageName: Baby
     sprite: {fileID: -7033090210418254279, guid: 9a1e0c98d892ea945abf7981f2d56972, type: 3}
     ticksToNextStage: 20
     caloriesConsumePerTick: 4
@@ -37,7 +38,7 @@ MonoBehaviour:
     canMove: 1
     spawnedCoinIntervalMin: 5
     spawnedCoinIntervalMax: 10
-  - stageName: Stage 3
+  - stageName: Dino
     sprite: {fileID: -974494812864979246, guid: 675d8366b95a4f146adfc24a6df8ea76, type: 3}
     ticksToNextStage: 0
     caloriesConsumePerTick: 2

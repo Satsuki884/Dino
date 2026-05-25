@@ -84,11 +84,13 @@ public class DinoTouchInput : MonoBehaviour
 
         if (pressedThisFrame)
         {
-            if (blockInputOverUI && IsPointerOverUI())
+            pointerStartPosition = screenPosition;
+
+            if (TrySelectDino(screenPosition))
                 return;
 
-            pointerStartPosition = screenPosition;
-            TrySelectDino(screenPosition);
+            if (blockInputOverUI && IsPointerOverUI())
+                return;
         }
 
         if (isPressed && selectedDino != null)
@@ -108,14 +110,14 @@ public class DinoTouchInput : MonoBehaviour
         }
     }
 
-    private void TrySelectDino(Vector2 screenPosition)
+    private bool TrySelectDino(Vector2 screenPosition)
     {
         if (mainCamera == null)
         {
             mainCamera = Camera.main;
 
             if (mainCamera == null)
-                return;
+                return false;
         }
 
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(screenPosition);
@@ -124,7 +126,7 @@ public class DinoTouchInput : MonoBehaviour
         Collider2D[] hits = Physics2D.OverlapPointAll(worldPosition);
 
         if (hits == null || hits.Length == 0)
-            return;
+            return false;
 
         foreach (Collider2D hit in hits)
         {
@@ -144,8 +146,10 @@ public class DinoTouchInput : MonoBehaviour
 
             selectedDino.SetDragging(true);
 
-            return;
+            return true;
         }
+
+        return false;
     }
 
     private void DragSelected(Vector2 screenPosition)
@@ -247,12 +251,29 @@ public class DinoTouchInput : MonoBehaviour
         if (GameManager.Instance == null)
             return position;
 
+        if (CanDragToRaidZone(position))
+            return position;
+
         Bounds bounds = GameManager.Instance.GetFieldBounds();
 
         position.x = Mathf.Clamp(position.x, bounds.min.x, bounds.max.x);
         position.y = Mathf.Clamp(position.y, bounds.min.y, bounds.max.y);
 
         return position;
+    }
+
+    private bool CanDragToRaidZone(Vector3 position)
+    {
+        if (selectedDino == null)
+            return false;
+
+        if (!selectedDino.CanGoToRaid())
+            return false;
+
+        if (raidDropZone == null)
+            return false;
+
+        return raidDropZone.ContainsPoint(position);
     }
 
     private bool IsPointerOverUI()

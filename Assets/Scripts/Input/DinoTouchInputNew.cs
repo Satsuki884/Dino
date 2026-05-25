@@ -68,11 +68,13 @@ public class DinoTouchInputNew : MonoBehaviour
 
         if (pressedThisFrame)
         {
-            if (blockInputOverUI && IsPointerOverUI())
+            pointerStartPosition = screenPosition;
+
+            if (TrySelectDino(screenPosition))
                 return;
 
-            pointerStartPosition = screenPosition;
-            TrySelectDino(screenPosition);
+            if (blockInputOverUI && IsPointerOverUI())
+                return;
         }
 
         if (isPressed && selectedDino != null)
@@ -92,7 +94,7 @@ public class DinoTouchInputNew : MonoBehaviour
         }
     }
 
-    private void TrySelectDino(Vector2 screenPosition)
+    private bool TrySelectDino(Vector2 screenPosition)
     {
         if (mainCamera == null)
             mainCamera = Camera.main;
@@ -100,7 +102,7 @@ public class DinoTouchInputNew : MonoBehaviour
         if (mainCamera == null)
         {
             Debug.LogError("Main Camera not found. Check MainCamera tag.");
-            return;
+            return false;
         }
 
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(screenPosition);
@@ -116,7 +118,7 @@ public class DinoTouchInputNew : MonoBehaviour
         Collider2D[] hits = Physics2D.OverlapPointAll(worldPosition);
 
         if (hits == null || hits.Length == 0)
-            return;
+            return false;
 
         foreach (Collider2D hit in hits)
         {
@@ -124,12 +126,12 @@ public class DinoTouchInputNew : MonoBehaviour
 
             if (dino == null)
             {
-                return;
+                continue;
             }
 
             if (dino.IsInRaid())
             {
-                return;
+                continue;
             }
 
             selectedDino = dino;
@@ -140,8 +142,10 @@ public class DinoTouchInputNew : MonoBehaviour
 
             selectedDino.SetDragging(true);
 
-            return;
+            return true;
         }
+
+        return false;
     }
 
     private void DragSelected(Vector2 screenPosition)

@@ -1,8 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
+using UnityEngine.SceneManagement;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -32,8 +34,23 @@ public class UIPanelController : MonoBehaviour
     [Header("Close Settings")]
     public bool closeWhenClickOutside = true;
 
+    [Header("Mini Menu")]
+    public GameObject miniMenuPanel;
+    public Button miniMenuButton;
+    public Button resumeButton;
+    public Button mainMenuButton;
+    public Slider musicVolumeSlider;
+    public Slider sfxVolumeSlider;
+
     private GameObject currentOpenPanel;
     private RectTransform currentOpenPanelRect;
+
+    private bool foodPanelHiddenDuringDrag;
+    private GameObject miniMenuInputBlocker;
+    private CanvasGroup miniMenuCanvasGroup;
+    private Canvas miniMenuCanvas;
+    private bool originalMiniMenuCanvasOverrideSorting;
+    private int originalMiniMenuCanvasSortingOrder;
 
     private bool ignoreNextOutsideClick;
     private readonly List<RaycastResult> uiRaycastResults = new List<RaycastResult>();
@@ -45,6 +62,10 @@ public class UIPanelController : MonoBehaviour
 
     private void Start()
     {
+        FindMiniMenuReferences();
+        ConfigureMiniMenu();
+        CloseMiniMenu();
+
         if (foodInventoryCanvasGroup == null && foodInventoryPanel != null)
             foodInventoryCanvasGroup = foodInventoryPanel.GetComponent<CanvasGroup>();
 
@@ -146,12 +167,49 @@ public class UIPanelController : MonoBehaviour
         CloseAllPanels();
 
         panel.SetActive(true);
+        ResetPanelScrollPositions(panel);
 
         if (panel == foodInventoryPanel)
             ShowFoodPanelVisuals();
 
         currentOpenPanel = panel;
         currentOpenPanelRect = panelRect;
+    }
+
+    private void ResetPanelScrollPositions(GameObject panel)
+    {
+        if (panel == null)
+            return;
+
+        ScrollRect[] scrollRects = panel.GetComponentsInChildren<ScrollRect>(true);
+
+        foreach (ScrollRect scrollRect in scrollRects)
+        {
+            if (scrollRect == null)
+                continue;
+
+            Canvas.ForceUpdateCanvases();
+            scrollRect.verticalNormalizedPosition = 1f;
+            scrollRect.horizontalNormalizedPosition = 0f;
+        }
+
+        StartCoroutine(ResetPanelScrollPositionsNextFrame(scrollRects));
+    }
+
+    private IEnumerator ResetPanelScrollPositionsNextFrame(ScrollRect[] scrollRects)
+    {
+        yield return null;
+
+        Canvas.ForceUpdateCanvases();
+
+        foreach (ScrollRect scrollRect in scrollRects)
+        {
+            if (scrollRect == null)
+                continue;
+
+            scrollRect.verticalNormalizedPosition = 1f;
+            scrollRect.horizontalNormalizedPosition = 0f;
+        }
     }
 
     public void CloseAllPanels()
@@ -386,5 +444,276 @@ public class UIPanelController : MonoBehaviour
 
         return Input.mousePosition;
 #endif
+    }
+
+    private void OnMiniMenuButtonClicked()
+    {
+        if (IsMiniMenuOpen())
+            return;
+
+        PlayClick();
+        OpenMiniMenu();
+    }
+
+    public void OpenMiniMenu()
+    {
+        if (miniMenuPanel == null)
+            return;
+
+        BindMiniMenuVolumeSliders();
+        CloseAllPanels();
+        EnsureMiniMenuInputBlocker();
+
+        if (miniMenuInputBlocker != null)
+        {
+            miniMenuInputBlocker.SetActive(true);
+            miniMenuInputBlocker.transform.SetAsLastSibling();
+        }
+
+        RaiseMiniMenuCanvas();
+
+        miniMenuPanel.SetActive(true);
+        miniMenuPanel.transform.SetAsLastSibling();
+
+        if (miniMenuCanvasGroup != null)
+        {
+            miniMenuCanvasGroup.alpha = 1f;
+            miniMenuCanvasGroup.interactable = true;
+            miniMenuCanvasGroup.blocksRaycasts = true;
+        }
+    }
+
+    private bool IsMiniMenuOpen()
+    {
+        return miniMenuPanel != null && miniMenuPanel.activeSelf;
+    }
+
+    private void OnResumeButtonClicked()
+    {
+        PlayClick();
+        CloseMiniMenu();
+    }
+
+    public void CloseMiniMenu()
+    {
+        if (miniMenuPanel != null)
+            miniMenuPanel.SetActive(false);
+
+        if (miniMenuInputBlocker != null)
+            miniMenuInputBlocker.SetActive(false);
+
+        RestoreMiniMenuCanvas();
+
+        if (miniMenuCanvasGroup != null)
+        {
+            miniMenuCanvasGroup.alpha = 1f;
+            miniMenuCanvasGroup.interactable = true;
+            miniMenuCanvasGroup.blocksRaycasts = true;
+        }
+    }
+
+    private void OnMainMenuButtonClicked()
+    {
+        PlayClick();
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.SaveGame();
+
+        SceneManager.LoadScene("Main Menu");
+    }
+
+    private void FindMiniMenuReferences()
+    {
+        if (miniMenuPanel == null)
+            miniMenuPanel = FindSceneObject("MinMenu_panel");
+
+        if (miniMenuButton == null)
+            miniMenuButton = FindButton("MinMenu_button");
+
+        if (resumeButton == null)
+            resumeButton = FindButton("Resume_but");
+
+        if (mainMenuButton == null)
+            mainMenuButton = FindButton("Main_menu_but");
+
+        if (musicVolumeSlider == null)
+            musicVolumeSlider = FindSlider("Music_vol");
+
+        if (sfxVolumeSlider == null)
+            sfxVolumeSlider = FindSlider("SFX_vol");
+
+        if (miniMenuPanel != null)
+        {
+            miniMenuCanvasGroup = miniMenuPanel.GetComponent<CanvasGroup>();
+            miniMenuCanvas = miniMenuPanel.GetComponentInParent<Canvas>();
+
+            if (miniMenuCanvas != null)
+            {
+                originalMiniMenuCanvasOverrideSorting = miniMenuCanvas.overrideSorting;
+                originalMiniMenuCanvasSortingOrder = miniMenuCanvas.sortingOrder;
+            }
+        }
+    }
+
+    private void ConfigureMiniMenu()
+    {
+        if (miniMenuButton != null)
+        {
+            miniMenuButton.onClick.RemoveListener(OnMiniMenuButtonClicked);
+            miniMenuButton.onClick.AddListener(OnMiniMenuButtonClicked);
+        }
+
+        if (resumeButton != null)
+        {
+            resumeButton.onClick.RemoveListener(OnResumeButtonClicked);
+            resumeButton.onClick.AddListener(OnResumeButtonClicked);
+        }
+
+        if (mainMenuButton != null)
+        {
+            mainMenuButton.onClick.RemoveListener(OnMainMenuButtonClicked);
+            mainMenuButton.onClick.AddListener(OnMainMenuButtonClicked);
+        }
+
+        if (musicVolumeSlider != null)
+        {
+            AddClickFeedback(musicVolumeSlider.gameObject);
+        }
+
+        if (sfxVolumeSlider != null)
+        {
+            AddClickFeedback(sfxVolumeSlider.gameObject);
+        }
+
+        BindMiniMenuVolumeSliders();
+        EnsureMiniMenuInputBlocker();
+    }
+
+    private void BindMiniMenuVolumeSliders()
+    {
+        if (AudioManager.Instanse == null)
+            return;
+
+        if (musicVolumeSlider != null)
+        {
+            musicVolumeSlider.onValueChanged.RemoveListener(AudioManager.Instanse.SetMusicVolume);
+            musicVolumeSlider.onValueChanged.AddListener(AudioManager.Instanse.SetMusicVolume);
+            AudioManager.Instanse.SetMusicVolume(musicVolumeSlider.value);
+        }
+
+        if (sfxVolumeSlider != null)
+        {
+            sfxVolumeSlider.onValueChanged.RemoveListener(AudioManager.Instanse.SetSFXVolume);
+            sfxVolumeSlider.onValueChanged.AddListener(AudioManager.Instanse.SetSFXVolume);
+            AudioManager.Instanse.SetSFXVolume(sfxVolumeSlider.value);
+        }
+    }
+
+    private void EnsureMiniMenuInputBlocker()
+    {
+        if (miniMenuInputBlocker != null)
+            return;
+
+        if (miniMenuPanel == null)
+            return;
+
+        Transform parent = miniMenuPanel.transform.parent;
+
+        if (parent == null)
+            return;
+
+        miniMenuInputBlocker = new GameObject("MiniMenu_InputBlocker");
+        miniMenuInputBlocker.transform.SetParent(parent, false);
+
+        RectTransform rect = miniMenuInputBlocker.AddComponent<RectTransform>();
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+
+        Image image = miniMenuInputBlocker.AddComponent<Image>();
+        image.color = new Color(0f, 0f, 0f, 0f);
+        image.raycastTarget = true;
+
+        miniMenuInputBlocker.SetActive(false);
+    }
+
+    private void RaiseMiniMenuCanvas()
+    {
+        if (miniMenuCanvas == null && miniMenuPanel != null)
+            miniMenuCanvas = miniMenuPanel.GetComponentInParent<Canvas>();
+
+        if (miniMenuCanvas == null)
+            return;
+
+        miniMenuCanvas.overrideSorting = true;
+        miniMenuCanvas.sortingOrder = 1000;
+    }
+
+    private void RestoreMiniMenuCanvas()
+    {
+        if (miniMenuCanvas == null)
+            return;
+
+        miniMenuCanvas.overrideSorting = originalMiniMenuCanvasOverrideSorting;
+        miniMenuCanvas.sortingOrder = originalMiniMenuCanvasSortingOrder;
+    }
+
+    private Button FindButton(string objectName)
+    {
+        GameObject found = FindSceneObject(objectName);
+        return found != null ? found.GetComponent<Button>() : null;
+    }
+
+    private Slider FindSlider(string objectName)
+    {
+        GameObject found = FindSceneObject(objectName);
+        return found != null ? found.GetComponent<Slider>() : null;
+    }
+
+    private GameObject FindSceneObject(string objectName)
+    {
+        GameObject found = GameObject.Find(objectName);
+
+        if (found != null)
+            return found;
+
+        Transform[] transforms = Resources.FindObjectsOfTypeAll<Transform>();
+
+        foreach (Transform transform in transforms)
+        {
+            if (transform == null)
+                continue;
+
+            if (transform.name != objectName)
+                continue;
+
+            if (!transform.gameObject.scene.IsValid())
+                continue;
+
+            return transform.gameObject;
+        }
+
+        return null;
+    }
+
+    private void AddClickFeedback(GameObject target)
+    {
+        if (target == null)
+            return;
+
+        if (target.GetComponent<UIAudioClickFeedback>() == null)
+            target.AddComponent<UIAudioClickFeedback>();
+    }
+
+}
+
+
+public class UIAudioClickFeedback : MonoBehaviour, IPointerDownHandler
+{
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (AudioManager.Instanse != null)
+            AudioManager.Instanse.PlayClick();
     }
 }
